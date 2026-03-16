@@ -1,5 +1,7 @@
 import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useStore } from "@/context/StoreContext";
+import { useAuth } from "@/context/AuthContext";
 import { Product } from "@/data/store";
 
 interface ProductCardProps {
@@ -17,7 +19,9 @@ const StarRating = ({ rating }: { rating: number }) => (
 
 const ProductCard = ({ product, showCountdown }: ProductCardProps) => {
   const { addToCart, toggleWishlist, wishlist } = useStore();
+  const { isAdmin } = useAuth();
   const isWished = wishlist.includes(product.id);
+  const displayImage = product.images && product.images.length > 0 ? product.images[0] : product.image;
 
   return (
     <div className="bg-card border border-border rounded-lg p-3 group relative hover:shadow-md transition-shadow">
@@ -33,18 +37,26 @@ const ProductCard = ({ product, showCountdown }: ProductCardProps) => {
         <Heart className={`w-4 h-4 ${isWished ? "fill-sale-badge text-sale-badge" : "text-muted-foreground"}`} />
       </button>
 
-      <div className="aspect-square mb-3 flex items-center justify-center overflow-hidden">
-        <img src={product.image} alt={product.name} className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-200" />
-      </div>
+      <Link to={`/product/${product.id}`}>
+        <div className="aspect-square mb-3 flex items-center justify-center overflow-hidden cursor-pointer">
+          <img src={displayImage} alt={product.name} className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-200" />
+        </div>
+      </Link>
 
       <div className="space-y-1">
-        <div className="flex items-center gap-2">
-          {product.originalPrice && (
-            <span className="text-xs text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
-          )}
-          <span className="text-sm font-bold text-foreground">${product.price.toFixed(2)}</span>
-        </div>
-        <p className="text-xs text-foreground font-medium line-clamp-2 leading-tight">{product.name}</p>
+        {isAdmin ? (
+          <div className="flex items-center gap-2">
+            {product.originalPrice && (
+              <span className="text-xs text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
+            )}
+            <span className="text-sm font-bold text-foreground">${product.price.toFixed(2)}</span>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground italic">Contact for price</p>
+        )}
+        <Link to={`/product/${product.id}`}>
+          <p className="text-xs text-foreground font-medium line-clamp-2 leading-tight hover:text-primary transition-colors">{product.name}</p>
+        </Link>
         <p className="text-[10px] text-muted-foreground">{product.category}</p>
         <StarRating rating={product.rating} />
 
