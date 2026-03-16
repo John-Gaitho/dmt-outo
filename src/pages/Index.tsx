@@ -5,9 +5,10 @@ import PromoBanners from "@/components/store/PromoBanners";
 import DealsSection from "@/components/store/DealsSection";
 import ProductSection from "@/components/store/ProductSection";
 import StoreFooter from "@/components/store/StoreFooter";
+import MobileBottomNav from "@/components/store/MobileBottomNav";
 
 const Index = () => (
-  <div className="min-h-screen bg-background">
+  <div className="min-h-screen bg-background pb-16 md:pb-0">
     <StoreHeader />
     <HeroSection />
     <CategorySection />
@@ -24,6 +25,7 @@ const Index = () => (
       subcategories={["Abs", "Accessories", "Brake Booster", "Brake Calipers", "Brake Cylinder"]}
     />
     <StoreFooter />
+    <MobileBottomNav />
   </div>
 );
 

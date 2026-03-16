@@ -1,5 +1,6 @@
 import StoreHeader from "@/components/store/StoreHeader";
 import StoreFooter from "@/components/store/StoreFooter";
+import MobileBottomNav from "@/components/store/MobileBottomNav";
 import ProductCard from "@/components/store/ProductCard";
 import { useStore } from "@/context/StoreContext";
 import { useState } from "react";
@@ -21,7 +22,7 @@ const ShopPage = () => {
   if (sortBy === "rating") filtered.sort((a, b) => b.rating - a.rating);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
       <StoreHeader />
       <div className="container py-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -49,14 +50,6 @@ const ShopPage = () => {
                 ))}
               </ul>
             </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="font-semibold text-sm mb-3 text-foreground">Price Range</h3>
-              <div className="flex gap-2">
-                <input type="number" placeholder="Min" className="w-full border border-border rounded px-2 py-1.5 text-xs" />
-                <input type="number" placeholder="Max" className="w-full border border-border rounded px-2 py-1.5 text-xs" />
-              </div>
-              <button className="mt-2 w-full bg-primary text-primary-foreground text-xs py-1.5 rounded font-medium">Apply</button>
-            </div>
           </aside>
           <div className="md:col-span-3">
             <div className="flex items-center justify-between mb-4">
@@ -80,6 +73,7 @@ const ShopPage = () => {
         </div>
       </div>
       <StoreFooter />
+      <MobileBottomNav />
     </div>
   );
 };
