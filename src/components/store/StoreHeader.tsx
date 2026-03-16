@@ -10,7 +10,7 @@ const TopBar = () => {
   return (
     <div className="bg-shop-topbar text-shop-topbar py-1.5 text-xs">
       <div className="container flex items-center justify-between">
-        <span className="hidden md:inline">Hi! Welcome to AutozPro online store.</span>
+        <span className="hidden md:inline">Hi! Welcome to DMT online store.</span>
         <div className="flex items-center gap-4">
           <Link to="/shop" className="hover:text-primary transition-colors">Catalogue</Link>
           <Link to="/shop" className="hover:text-primary transition-colors hidden md:inline">FAQ</Link>

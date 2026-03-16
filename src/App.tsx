@@ -12,6 +12,8 @@ import AdminPage from "./pages/AdminPage.tsx";
 import AuthPage from "./pages/AuthPage.tsx";
 import ProductDetailPage from "./pages/ProductDetailPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import LiveChat from "@/components/LiveChat";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,8 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+              <WhatsAppButton />
+              <LiveChat />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/shop" element={<ShopPage />} />
