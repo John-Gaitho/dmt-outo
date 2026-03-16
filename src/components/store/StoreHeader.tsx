@@ -1,0 +1,152 @@
+import { Search, HelpCircle, Heart, ShoppingCart, User, ChevronDown, Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useStore } from "@/context/StoreContext";
+import { useState } from "react";
+import logo from "@/assets/logo.png";
+
+const TopBar = () => (
+  <div className="bg-shop-topbar text-shop-topbar py-1.5 text-xs">
+    <div className="container flex items-center justify-between">
+      <span>Hi! Welcome to AutozPro online store.</span>
+      <div className="hidden md:flex items-center gap-4">
+        <Link to="/catalogue" className="hover:text-primary transition-colors">Catalogue</Link>
+        <Link to="/faq" className="hover:text-primary transition-colors">FAQ</Link>
+        <Link to="/contact" className="hover:text-primary transition-colors">Contact Us</Link>
+        <Link to="/admin" className="font-semibold hover:text-primary transition-colors">Sign in or Register</Link>
+      </div>
+    </div>
+  </div>
+);
+
+const HeaderMain = () => {
+  const { cartCount, cartTotal, wishlist, searchQuery, setSearchQuery } = useStore();
+
+  return (
+    <div className="bg-card border-b border-border py-3">
+      <div className="container flex items-center gap-4">
+        <Link to="/" className="flex-shrink-0">
+          <img src={logo} alt="AutozPro" className="h-10" />
+        </Link>
+
+        <div className="hidden lg:flex items-center bg-secondary text-secondary-foreground rounded px-3 py-2 text-sm font-medium cursor-pointer gap-1">
+          <Menu className="w-4 h-4" />
+          Shop by Category
+        </div>
+
+        <div className="flex-1 flex items-center max-w-2xl">
+          <select className="hidden md:block bg-muted border border-border rounded-l px-3 py-2 text-sm">
+            <option>All Categories</option>
+          </select>
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              placeholder="Search for products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full border border-border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary md:border-l-0"
+            />
+          </div>
+          <button className="bg-primary text-primary-foreground px-4 py-2 rounded-r hover:opacity-90 transition-opacity">
+            <Search className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="hidden md:flex items-center gap-5">
+          <Link to="/faq" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <HelpCircle className="w-5 h-5" />
+            <span className="hidden xl:inline">Help Center</span>
+          </Link>
+          <Link to="/wishlist" className="relative flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Heart className="w-5 h-5" />
+            {wishlist.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                {wishlist.length}
+              </span>
+            )}
+          </Link>
+          <Link to="/cart" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <div className="relative">
+              <ShoppingCart className="w-5 h-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </div>
+            <div className="hidden xl:block">
+              <div className="text-[10px]">Shopping Cart</div>
+              <div className="font-semibold text-foreground">${cartTotal.toFixed(2)}</div>
+            </div>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Navigation = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const navLinks = [
+    { label: "Home", to: "/" },
+    { label: "Shop", to: "/shop" },
+    { label: "Category", to: "/shop" },
+    { label: "Your Recently Viewed", to: "/shop" },
+    { label: "Pages", to: "/" },
+    { label: "Blog", to: "/" },
+  ];
+
+  return (
+    <nav className="bg-card border-b border-border">
+      <div className="container flex items-center justify-between">
+        <div className="hidden md:flex items-center">
+          {navLinks.map((link) => (
+            <Link
+              key={link.label}
+              to={link.to}
+              className="px-4 py-3 text-sm font-medium text-foreground hover:text-primary transition-colors flex items-center gap-1"
+            >
+              {link.label}
+              {["Shop", "Category", "Pages", "Blog"].includes(link.label) && (
+                <ChevronDown className="w-3 h-3" />
+              )}
+            </Link>
+          ))}
+        </div>
+        <div className="hidden md:flex items-center gap-3 text-sm text-muted-foreground">
+          <span>USD</span>
+          <span>English</span>
+        </div>
+        <button className="md:hidden p-3" onClick={() => setMobileOpen(!mobileOpen)}>
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+      {mobileOpen && (
+        <div className="md:hidden border-t border-border">
+          {navLinks.map((link) => (
+            <Link
+              key={link.label}
+              to={link.to}
+              className="block px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <Link to="/admin" className="block px-4 py-3 text-sm font-semibold text-primary" onClick={() => setMobileOpen(false)}>
+            Admin Panel
+          </Link>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+const StoreHeader = () => (
+  <header className="sticky top-0 z-50">
+    <TopBar />
+    <HeaderMain />
+    <Navigation />
+  </header>
+);
+
+export default StoreHeader;
