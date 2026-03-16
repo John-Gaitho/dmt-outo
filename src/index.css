@@ -99,6 +99,10 @@
   }
 }
 
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 @layer utilities {
   .text-shop-topbar {
     color: hsl(var(--shop-topbar-foreground));
