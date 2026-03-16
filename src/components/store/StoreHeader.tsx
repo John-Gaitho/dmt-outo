@@ -5,19 +5,28 @@ import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
 
-const TopBar = () => (
-  <div className="bg-shop-topbar text-shop-topbar py-1.5 text-xs">
-    <div className="container flex items-center justify-between">
-      <span>Hi! Welcome to AutozPro online store.</span>
-      <div className="hidden md:flex items-center gap-4">
-        <Link to="/catalogue" className="hover:text-primary transition-colors">Catalogue</Link>
-        <Link to="/faq" className="hover:text-primary transition-colors">FAQ</Link>
-        <Link to="/contact" className="hover:text-primary transition-colors">Contact Us</Link>
-        <Link to="/admin" className="font-semibold hover:text-primary transition-colors">Sign in or Register</Link>
+const TopBar = () => {
+  const { user, isAdmin, signOut } = useAuth();
+  return (
+    <div className="bg-shop-topbar text-shop-topbar py-1.5 text-xs">
+      <div className="container flex items-center justify-between">
+        <span className="hidden md:inline">Hi! Welcome to AutozPro online store.</span>
+        <div className="flex items-center gap-4">
+          <Link to="/shop" className="hover:text-primary transition-colors">Catalogue</Link>
+          <Link to="/shop" className="hover:text-primary transition-colors hidden md:inline">FAQ</Link>
+          {user ? (
+            <>
+              {isAdmin && <Link to="/admin" className="font-semibold hover:text-primary transition-colors">Admin Panel</Link>}
+              <button onClick={signOut} className="hover:text-primary transition-colors flex items-center gap-1"><LogOut className="w-3 h-3" /> Sign out</button>
+            </>
+          ) : (
+            <Link to="/auth" className="font-semibold hover:text-primary transition-colors">Sign in or Register</Link>
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const HeaderMain = () => {
   const { cartCount, cartTotal, wishlist, searchQuery, setSearchQuery } = useStore();
