@@ -1,6 +1,7 @@
-import { Search, HelpCircle, Heart, ShoppingCart, User, ChevronDown, Menu, X } from "lucide-react";
+import { Search, HelpCircle, Heart, ShoppingCart, User, ChevronDown, Menu, X, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useStore } from "@/context/StoreContext";
+import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
 
