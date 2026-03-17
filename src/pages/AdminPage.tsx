@@ -149,7 +149,7 @@ const StatCard = ({ title, value, icon: Icon, trend }: { title: string; value: s
 const DashboardTab = ({ totalRevenue, totalOrders, totalProducts, orders }: any) => (
   <div className="space-y-6">
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-      <StatCard title="Total Revenue" value={`$${totalRevenue.toFixed(2)}`} icon={DollarSign} trend="12% from last month" />
+      <StatCard title="Total Revenue" value={`KSH ${totalRevenue.toLocaleString()}`} icon={DollarSign} trend="12% from last month" />
       <StatCard title="Total Orders" value={totalOrders} icon={ShoppingCart} trend="8% from last month" />
       <StatCard title="Total Products" value={totalProducts} icon={Package} />
       <StatCard title="Page Views" value="1,234" icon={Eye} trend="5% from last month" />
