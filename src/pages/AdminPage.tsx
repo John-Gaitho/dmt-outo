@@ -165,7 +165,7 @@ const DashboardTab = ({ totalRevenue, totalOrders, totalProducts, orders }: any)
             <tr key={order.id} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
               <td className="py-2.5 font-medium text-foreground">{order.id}</td>
               <td className="py-2.5 text-muted-foreground">{order.customer}</td>
-              <td className="py-2.5 text-foreground">${order.total.toFixed(2)}</td>
+              <td className="py-2.5 text-foreground">KSH {order.total.toLocaleString()}</td>
               <td className="py-2.5"><StatusBadge status={order.status} /></td>
               <td className="py-2.5 text-muted-foreground">{order.date}</td>
             </tr>
