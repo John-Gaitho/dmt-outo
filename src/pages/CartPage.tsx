@@ -53,7 +53,7 @@ const CartPage = () => {
                     <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
                     <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="p-1 border border-border rounded hover:bg-muted"><Plus className="w-3 h-3" /></button>
                   </div>
-                  {isAdmin && <p className="text-sm font-bold text-foreground w-16 text-right hidden md:block">${(item.product.price * item.quantity).toFixed(2)}</p>}
+                  {isAdmin && <p className="text-sm font-bold text-foreground w-20 text-right hidden md:block">KSH {(item.product.price * item.quantity).toLocaleString()}</p>}
                   <button onClick={() => removeFromCart(item.product.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded"><Trash2 className="w-4 h-4" /></button>
                 </div>
               ))}
