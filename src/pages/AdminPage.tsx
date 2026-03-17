@@ -353,7 +353,7 @@ const OrdersTab = ({ orders, onUpdateStatus }: any) => (
           <tr key={order.id} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
             <td className="p-3 font-medium text-foreground">{order.id}</td>
             <td className="p-3 text-muted-foreground">{order.customer}</td>
-            <td className="p-3 font-medium text-foreground">${order.total.toFixed(2)}</td>
+            <td className="p-3 font-medium text-foreground">KSH {order.total.toLocaleString()}</td>
             <td className="p-3"><StatusBadge status={order.status} /></td>
             <td className="p-3 text-muted-foreground text-xs">{order.date}</td>
             <td className="p-3">
