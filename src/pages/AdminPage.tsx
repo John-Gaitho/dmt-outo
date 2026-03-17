@@ -326,7 +326,7 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
                   <span className="font-medium text-foreground text-xs line-clamp-1">{p.name}</span>
                 </td>
                 <td className="p-3 text-xs text-muted-foreground">{p.category}</td>
-                <td className="p-3 text-xs font-medium text-foreground">${p.price.toFixed(2)}</td>
+                <td className="p-3 text-xs font-medium text-foreground">KSH {p.price.toLocaleString()}</td>
                 <td className="p-3 text-xs text-muted-foreground">{p.images ? p.images.length : 1}</td>
                 <td className="p-3"><span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${p.inStock ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>{p.inStock ? "In Stock" : "Out"}</span></td>
                 <td className="p-3 flex gap-1">
