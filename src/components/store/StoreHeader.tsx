@@ -35,7 +35,7 @@ const HeaderMain = () => {
     <div className="bg-card border-b border-border py-3">
       <div className="container flex items-center gap-4">
         <Link to="/" className="flex-shrink-0">
-          <img src={logo} alt="AutozPro" className="h-10" />
+          <img src={logo} alt="AutozPro" className="h-16 w-auto object-contain" />
         </Link>
 
         <div className="hidden lg:flex items-center bg-secondary text-secondary-foreground rounded px-3 py-2 text-sm font-medium cursor-pointer gap-1">

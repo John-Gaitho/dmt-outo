@@ -15,7 +15,7 @@ const ProductSection = ({ title, category, subcategories, bgClass }: ProductSect
   return (
     <section className="py-4">
       <div className="container">
-        <div className={`grid grid-cols-1 md:grid-cols-5 gap-0 rounded-lg overflow-hidden border border-border ${bgClass || ""}`}>
+        <div className={`grid grid-cols-2 md:grid-cols-5 gap-0 rounded-lg overflow-hidden border border-border ${bgClass || ""}`}>
           <div className="bg-secondary text-secondary-foreground p-5 flex flex-col justify-between">
             <div>
               <h3 className="text-lg font-bold mb-3">{title}</h3>
