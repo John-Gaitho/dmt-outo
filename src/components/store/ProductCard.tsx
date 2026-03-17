@@ -47,9 +47,9 @@ const ProductCard = ({ product, showCountdown }: ProductCardProps) => {
         {isAdmin ? (
           <div className="flex items-center gap-2">
             {product.originalPrice && (
-              <span className="text-xs text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
+              <span className="text-xs text-muted-foreground line-through">KSH {product.originalPrice.toLocaleString()}</span>
             )}
-            <span className="text-sm font-bold text-foreground">${product.price.toFixed(2)}</span>
+            <span className="text-sm font-bold text-foreground">KSH {product.price.toLocaleString()}</span>
           </div>
         ) : (
           <p className="text-xs text-muted-foreground italic">Contact for price</p>

@@ -149,7 +149,7 @@ const StatCard = ({ title, value, icon: Icon, trend }: { title: string; value: s
 const DashboardTab = ({ totalRevenue, totalOrders, totalProducts, orders }: any) => (
   <div className="space-y-6">
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-      <StatCard title="Total Revenue" value={`$${totalRevenue.toFixed(2)}`} icon={DollarSign} trend="12% from last month" />
+      <StatCard title="Total Revenue" value={`KSH ${totalRevenue.toLocaleString()}`} icon={DollarSign} trend="12% from last month" />
       <StatCard title="Total Orders" value={totalOrders} icon={ShoppingCart} trend="8% from last month" />
       <StatCard title="Total Products" value={totalProducts} icon={Package} />
       <StatCard title="Page Views" value="1,234" icon={Eye} trend="5% from last month" />
@@ -165,7 +165,7 @@ const DashboardTab = ({ totalRevenue, totalOrders, totalProducts, orders }: any)
             <tr key={order.id} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
               <td className="py-2.5 font-medium text-foreground">{order.id}</td>
               <td className="py-2.5 text-muted-foreground">{order.customer}</td>
-              <td className="py-2.5 text-foreground">${order.total.toFixed(2)}</td>
+              <td className="py-2.5 text-foreground">KSH {order.total.toLocaleString()}</td>
               <td className="py-2.5"><StatusBadge status={order.status} /></td>
               <td className="py-2.5 text-muted-foreground">{order.date}</td>
             </tr>
@@ -326,7 +326,7 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
                   <span className="font-medium text-foreground text-xs line-clamp-1">{p.name}</span>
                 </td>
                 <td className="p-3 text-xs text-muted-foreground">{p.category}</td>
-                <td className="p-3 text-xs font-medium text-foreground">${p.price.toFixed(2)}</td>
+                <td className="p-3 text-xs font-medium text-foreground">KSH {p.price.toLocaleString()}</td>
                 <td className="p-3 text-xs text-muted-foreground">{p.images ? p.images.length : 1}</td>
                 <td className="p-3"><span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${p.inStock ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>{p.inStock ? "In Stock" : "Out"}</span></td>
                 <td className="p-3 flex gap-1">
@@ -353,7 +353,7 @@ const OrdersTab = ({ orders, onUpdateStatus }: any) => (
           <tr key={order.id} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
             <td className="p-3 font-medium text-foreground">{order.id}</td>
             <td className="p-3 text-muted-foreground">{order.customer}</td>
-            <td className="p-3 font-medium text-foreground">${order.total.toFixed(2)}</td>
+            <td className="p-3 font-medium text-foreground">KSH {order.total.toLocaleString()}</td>
             <td className="p-3"><StatusBadge status={order.status} /></td>
             <td className="p-3 text-muted-foreground text-xs">{order.date}</td>
             <td className="p-3">
@@ -396,7 +396,7 @@ const CustomersTab = ({ orders }: any) => {
               <td className="p-3 font-medium text-foreground">{c.name}</td>
               <td className="p-3 text-muted-foreground text-xs">{c.email}</td>
               <td className="p-3 text-foreground">{c.orders}</td>
-              <td className="p-3 font-medium text-foreground">${c.total.toFixed(2)}</td>
+              <td className="p-3 font-medium text-foreground">KSH {c.total.toLocaleString()}</td>
             </tr>
           ))}
         </tbody>

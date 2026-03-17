@@ -46,14 +46,14 @@ const CartPage = () => {
                   <div className="flex-1 min-w-0">
                     <Link to={`/product/${item.product.id}`} className="text-sm font-medium text-foreground hover:text-primary line-clamp-2">{item.product.name}</Link>
                     <p className="text-xs text-muted-foreground">{item.product.category}</p>
-                    {isAdmin && <p className="text-sm font-bold text-foreground mt-1">${item.product.price.toFixed(2)}</p>}
+                    {isAdmin && <p className="text-sm font-bold text-foreground mt-1">KSH {item.product.price.toLocaleString()}</p>}
                   </div>
                   <div className="flex items-center gap-1 md:gap-2">
                     <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="p-1 border border-border rounded hover:bg-muted"><Minus className="w-3 h-3" /></button>
                     <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
                     <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="p-1 border border-border rounded hover:bg-muted"><Plus className="w-3 h-3" /></button>
                   </div>
-                  {isAdmin && <p className="text-sm font-bold text-foreground w-16 text-right hidden md:block">${(item.product.price * item.quantity).toFixed(2)}</p>}
+                  {isAdmin && <p className="text-sm font-bold text-foreground w-20 text-right hidden md:block">KSH {(item.product.price * item.quantity).toLocaleString()}</p>}
                   <button onClick={() => removeFromCart(item.product.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded"><Trash2 className="w-4 h-4" /></button>
                 </div>
               ))}
@@ -62,9 +62,9 @@ const CartPage = () => {
               <h3 className="font-semibold text-foreground mb-4">Order Summary</h3>
               {isAdmin ? (
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>${cartTotal.toFixed(2)}</span></div>
+                  <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>KSH {cartTotal.toLocaleString()}</span></div>
                   <div className="flex justify-between text-muted-foreground"><span>Shipping</span><span>Free</span></div>
-                  <div className="border-t border-border pt-2 flex justify-between font-bold text-foreground"><span>Total</span><span>${cartTotal.toFixed(2)}</span></div>
+                  <div className="border-t border-border pt-2 flex justify-between font-bold text-foreground"><span>Total</span><span>KSH {cartTotal.toLocaleString()}</span></div>
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">Contact us for pricing details</p>

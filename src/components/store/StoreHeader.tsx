@@ -85,7 +85,7 @@ const HeaderMain = () => {
             </div>
             <div className="hidden xl:block">
               <div className="text-[10px]">Shopping Cart</div>
-              <div className="font-semibold text-foreground">${cartTotal.toFixed(2)}</div>
+              <div className="font-semibold text-foreground">KSH {cartTotal.toLocaleString()}</div>
             </div>
           </Link>
         </div>
@@ -123,7 +123,7 @@ const Navigation = () => {
           ))}
         </div>
         <div className="hidden md:flex items-center gap-3 text-sm text-muted-foreground">
-          <span>USD</span>
+          <span>KSH</span>
           <span>English</span>
         </div>
         <button className="md:hidden p-3" onClick={() => setMobileOpen(!mobileOpen)}>
