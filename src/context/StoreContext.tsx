@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
-import { Product, CartItem, Order, sampleOrders, products as allProducts } from "@/data/store";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { Product, CartItem, Order, sampleOrders } from "@/data/store";
+import { supabase } from "@/integrations/supabase/client";
 
 interface StoreContextType {
   cart: CartItem[];
@@ -15,6 +16,8 @@ interface StoreContextType {
   addOrder: (order: Order) => void;
   updateOrderStatus: (orderId: string, status: Order["status"]) => void;
   products: Product[];
+  productsLoading: boolean;
+  refreshProducts: () => Promise<void>;
   addProduct: (product: Product) => void;
   updateProduct: (product: Product) => void;
   deleteProduct: (productId: string) => void;
@@ -24,12 +27,44 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
+const mapDbProduct = (row: any): Product => ({
+  id: row.id,
+  name: row.name,
+  price: Number(row.price),
+  originalPrice: row.original_price ? Number(row.original_price) : undefined,
+  category: row.category,
+  subcategory: row.subcategory || undefined,
+  image: row.images?.[0] || "",
+  images: row.images || [],
+  rating: Number(row.rating),
+  reviews: row.reviews,
+  inStock: row.in_stock,
+  featured: row.featured,
+  deal: row.deal,
+  discount: row.discount || undefined,
+  description: row.description || undefined,
+});
+
 export const StoreProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [orders, setOrders] = useState<Order[]>(sampleOrders);
-  const [products, setProducts] = useState<Product[]>(allProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const fetchProducts = async () => {
+    setProductsLoading(true);
+    const { data, error } = await supabase.from("products").select("*");
+    if (!error && data) {
+      setProducts(data.map(mapDbProduct));
+    }
+    setProductsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -76,12 +111,47 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  const addProduct = (product: Product) => setProducts((prev) => [...prev, product]);
-  const updateProduct = (product: Product) => {
-    setProducts((prev) => prev.map((p) => (p.id === product.id ? product : p)));
+  const addProduct = async (product: Product) => {
+    const { error } = await supabase.from("products").insert({
+      name: product.name,
+      price: product.price,
+      original_price: product.originalPrice || null,
+      category: product.category,
+      subcategory: product.subcategory || null,
+      images: product.images || [],
+      rating: product.rating,
+      reviews: product.reviews,
+      in_stock: product.inStock,
+      featured: product.featured || false,
+      deal: product.deal || false,
+      discount: product.discount || null,
+      description: product.description || null,
+    });
+    if (!error) await fetchProducts();
   };
-  const deleteProduct = (productId: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== productId));
+
+  const updateProduct = async (product: Product) => {
+    const { error } = await supabase.from("products").update({
+      name: product.name,
+      price: product.price,
+      original_price: product.originalPrice || null,
+      category: product.category,
+      subcategory: product.subcategory || null,
+      images: product.images || [],
+      rating: product.rating,
+      reviews: product.reviews,
+      in_stock: product.inStock,
+      featured: product.featured || false,
+      deal: product.deal || false,
+      discount: product.discount || null,
+      description: product.description || null,
+    }).eq("id", product.id);
+    if (!error) await fetchProducts();
+  };
+
+  const deleteProduct = async (productId: string) => {
+    const { error } = await supabase.from("products").delete().eq("id", productId);
+    if (!error) await fetchProducts();
   };
 
   return (
@@ -90,7 +160,8 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
         cart, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount,
         wishlist, toggleWishlist,
         orders, addOrder, updateOrderStatus,
-        products, addProduct, updateProduct, deleteProduct,
+        products, productsLoading, refreshProducts: fetchProducts,
+        addProduct, updateProduct, deleteProduct,
         searchQuery, setSearchQuery,
       }}
     >
