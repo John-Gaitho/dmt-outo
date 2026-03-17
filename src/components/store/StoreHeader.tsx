@@ -85,7 +85,7 @@ const HeaderMain = () => {
             </div>
             <div className="hidden xl:block">
               <div className="text-[10px]">Shopping Cart</div>
-              <div className="font-semibold text-foreground">${cartTotal.toFixed(2)}</div>
+              <div className="font-semibold text-foreground">KSH {cartTotal.toLocaleString()}</div>
             </div>
           </Link>
         </div>
