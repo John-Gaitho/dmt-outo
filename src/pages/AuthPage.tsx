@@ -49,7 +49,7 @@ const AuthPage = () => {
             {isLogin ? "Sign In" : "Create Account"}
           </h1>
           <p className="text-sm text-muted-foreground text-center mb-6">
-            {isLogin ? "Welcome back to AutozPro" : "Join AutozPro today"}
+            {isLogin ? "Welcome to DMT" : "Join DMT today"}
           </p>
           
           <form onSubmit={handleSubmit} className="space-y-4">

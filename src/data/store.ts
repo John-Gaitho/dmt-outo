@@ -1,3 +1,5 @@
+/* ================= IMPORTS ================= */
+
 import productBrakeDisc from "@/assets/product-brake-disc.png";
 import productTire from "@/assets/product-tire.png";
 import productHeadlight from "@/assets/product-headlight.png";
@@ -5,7 +7,6 @@ import productAirFilter from "@/assets/product-air-filter.png";
 import productBattery from "@/assets/product-battery.png";
 import productSuspension from "@/assets/product-suspension.png";
 import productOil from "@/assets/product-oil.png";
-import Productshell from "@/assets/product-shell.png";
 
 /* ================= TYPES ================= */
 
@@ -45,7 +46,43 @@ export interface Order {
 export interface Category {
   name: string;
   count: number;
+  image: string;
 }
+
+/* ================= STATIC CATEGORIES ================= */
+
+export const categories: Category[] = [
+  {
+    name: "Air & Fuel Delivery",
+    count: 1,
+    image: productBrakeDisc,
+  },
+  {
+    name: "Exterior & Accessories",
+    count: 1,
+    image: productTire,
+  },
+  {
+    name: "Headlights & Lighting",
+    count: 4,
+    image: productHeadlight,
+  },
+  {
+    name: "Brakes & Rotors",
+    count: 4,
+    image: productBrakeDisc,
+  },
+  {
+    name: "Engines & Components",
+    count: 1,
+    image: productOil,
+  },
+  {
+    name: "Electrical",
+    count: 1,
+    image: productBattery,
+  },
+];
 
 /* ================= PRODUCTS ================= */
 
@@ -63,7 +100,6 @@ export const products: Product[] = [
     deal: true,
     discount: 20,
   },
-
   {
     id: "2",
     name: "Pierce PS Series Self-Recovery Electric Winch",
@@ -75,10 +111,9 @@ export const products: Product[] = [
     inStock: true,
     deal: true,
   },
-
   {
     id: "3",
-    name: "FUEL D556 COUPLER Black with Machined Accents",
+    name: "FUEL D556 Coupler Black with Machined Accents",
     price: 12.9,
     category: "Headlights & Lighting",
     subcategory: "Bulbs",
@@ -88,10 +123,9 @@ export const products: Product[] = [
     inStock: true,
     featured: true,
   },
-
   {
     id: "4",
-    name: "Grant Revolution Style Air-Bag Replacement Wheel",
+    name: "Grant Revolution Air-Bag Replacement Wheel",
     price: 12.9,
     category: "Headlights & Lighting",
     subcategory: "Car Reflectors",
@@ -101,10 +135,9 @@ export const products: Product[] = [
     inStock: true,
     featured: true,
   },
-
   {
     id: "5",
-    name: "AWS Tuning OFG 304 SS Cat-Back Exhaust System",
+    name: "AWS Tuning 304 SS Cat-Back Exhaust System",
     price: 18.9,
     category: "Headlights & Lighting",
     subcategory: "Running Lights",
@@ -114,10 +147,9 @@ export const products: Product[] = [
     inStock: true,
     featured: true,
   },
-
   {
     id: "6",
-    name: "Pierce PS Series Electric Motor",
+    name: "Pierce Electric Motor",
     price: 35.9,
     category: "Headlights & Lighting",
     subcategory: "Door Light",
@@ -127,10 +159,9 @@ export const products: Product[] = [
     inStock: true,
     featured: true,
   },
-
   {
     id: "7",
-    name: "NRG Innovations Chrome Classic Wheel",
+    name: "NRG Chrome Classic Wheel",
     price: 19,
     originalPrice: 24,
     category: "Brakes & Rotors",
@@ -141,7 +172,6 @@ export const products: Product[] = [
     inStock: true,
     discount: 20,
   },
-
   {
     id: "8",
     name: "ReadyLIFT Front Leveling Kit",
@@ -153,7 +183,6 @@ export const products: Product[] = [
     reviews: 5,
     inStock: true,
   },
-
   {
     id: "9",
     name: "Covercraft Outdoor Car Cover",
@@ -167,7 +196,6 @@ export const products: Product[] = [
     inStock: true,
     discount: 15,
   },
-
   {
     id: "10",
     name: "Pierce Electric Compressor",
@@ -179,7 +207,6 @@ export const products: Product[] = [
     reviews: 14,
     inStock: true,
   },
-
   {
     id: "11",
     name: "Premium Synthetic Motor Oil 5W-30",
@@ -192,7 +219,6 @@ export const products: Product[] = [
     inStock: true,
     discount: 25,
   },
-
   {
     id: "12",
     name: "Heavy Duty Car Battery 12V 750CCA",
@@ -203,35 +229,7 @@ export const products: Product[] = [
     reviews: 33,
     inStock: true,
   },
-
-  {
-    id: "13",
-    name: "Pierce PS Series Self-Recovery Electric Winch",
-    price: 35.9,
-    category: "Exterior & Accessories",
-    image: Productshell,
-    rating: 5,
-    reviews: 8,
-    inStock: true,
-    deal: true,
-  },
 ];
-
-/* ================= AUTO GENERATED CATEGORIES ================= */
-
-export const categories: Category[] = Array.from(
-  new Set(products.map((p) => p.category))
-).map((category) => ({
-  name: category,
-  count: products.filter((p) => p.category === category).length,
-}));
-
-/* ================= CATEGORY IMAGE HELPER ================= */
-
-export const getCategoryImage = (categoryName: string) => {
-  const product = products.find((p) => p.category === categoryName);
-  return product?.image || "";
-};
 
 /* ================= SAMPLE ORDERS ================= */
 
@@ -245,7 +243,6 @@ export const sampleOrders: Order[] = [
     customer: "John Smith",
     email: "john@example.com",
   },
-
   {
     id: "ORD-002",
     items: [
@@ -258,26 +255,6 @@ export const sampleOrders: Order[] = [
     customer: "Sarah Johnson",
     email: "sarah@example.com",
   },
-
-  {
-    id: "ORD-003",
-    items: [{ product: products[10], quantity: 3 }],
-    total: 89.97,
-    status: "shipped",
-    date: "2026-03-15",
-    customer: "Mike Davis",
-    email: "mike@example.com",
-  },
-
-  {
-    id: "ORD-004",
-    items: [{ product: products[11], quantity: 1 }],
-    total: 89.99,
-    status: "pending",
-    date: "2026-03-16",
-    customer: "Emily Chen",
-    email: "emily@example.com",
-  },
 ];
 
 /* ================= CAR DATA ================= */
@@ -286,29 +263,19 @@ export const carMakes = [
   "Toyota",
   "Honda",
   "Ford",
-  "Chevrolet",
   "BMW",
   "Mercedes-Benz",
-  "Audi",
-  "Nissan",
-  "Hyundai",
-  "Kia",
 ];
 
 export const carModels: Record<string, string[]> = {
-  Toyota: ["Camry", "Corolla", "RAV4", "Highlander", "Tacoma"],
-  Honda: ["Civic", "Accord", "CR-V", "Pilot", "HR-V"],
-  Ford: ["F-150", "Mustang", "Explorer", "Escape", "Bronco"],
-  Chevrolet: ["Silverado", "Malibu", "Equinox", "Tahoe", "Camaro"],
-  BMW: ["3 Series", "5 Series", "X3", "X5", "7 Series"],
-  "Mercedes-Benz": ["C-Class", "E-Class", "GLC", "GLE", "S-Class"],
-  Audi: ["A4", "A6", "Q5", "Q7", "A3"],
-  Nissan: ["Altima", "Rogue", "Sentra", "Pathfinder", "Frontier"],
-  Hyundai: ["Elantra", "Tucson", "Santa Fe", "Sonata", "Kona"],
-  Kia: ["Forte", "Sportage", "Telluride", "Sorento", "Seltos"],
+  Toyota: ["Camry", "Corolla", "RAV4"],
+  Honda: ["Civic", "Accord"],
+  Ford: ["F-150", "Mustang"],
+  BMW: ["3 Series", "X5"],
+  "Mercedes-Benz": ["C-Class", "E-Class"],
 };
 
-export const carYears = Array.from({ length: 30 }, (_, i) =>
+export const carYears = Array.from({ length: 20 }, (_, i) =>
   (2026 - i).toString()
 );
 
