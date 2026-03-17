@@ -46,7 +46,7 @@ const CartPage = () => {
                   <div className="flex-1 min-w-0">
                     <Link to={`/product/${item.product.id}`} className="text-sm font-medium text-foreground hover:text-primary line-clamp-2">{item.product.name}</Link>
                     <p className="text-xs text-muted-foreground">{item.product.category}</p>
-                    {isAdmin && <p className="text-sm font-bold text-foreground mt-1">${item.product.price.toFixed(2)}</p>}
+                    {isAdmin && <p className="text-sm font-bold text-foreground mt-1">KSH {item.product.price.toLocaleString()}</p>}
                   </div>
                   <div className="flex items-center gap-1 md:gap-2">
                     <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="p-1 border border-border rounded hover:bg-muted"><Minus className="w-3 h-3" /></button>
