@@ -62,9 +62,9 @@ const CartPage = () => {
               <h3 className="font-semibold text-foreground mb-4">Order Summary</h3>
               {isAdmin ? (
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>${cartTotal.toFixed(2)}</span></div>
+                  <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>KSH {cartTotal.toLocaleString()}</span></div>
                   <div className="flex justify-between text-muted-foreground"><span>Shipping</span><span>Free</span></div>
-                  <div className="border-t border-border pt-2 flex justify-between font-bold text-foreground"><span>Total</span><span>${cartTotal.toFixed(2)}</span></div>
+                  <div className="border-t border-border pt-2 flex justify-between font-bold text-foreground"><span>Total</span><span>KSH {cartTotal.toLocaleString()}</span></div>
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">Contact us for pricing details</p>

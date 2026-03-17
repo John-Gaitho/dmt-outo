@@ -123,7 +123,7 @@ const Navigation = () => {
           ))}
         </div>
         <div className="hidden md:flex items-center gap-3 text-sm text-muted-foreground">
-          <span>USD</span>
+          <span>KSH</span>
           <span>English</span>
         </div>
         <button className="md:hidden p-3" onClick={() => setMobileOpen(!mobileOpen)}>

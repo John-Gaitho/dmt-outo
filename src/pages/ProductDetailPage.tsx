@@ -108,9 +108,9 @@ const ProductDetailPage = () => {
             {isAdmin ? (
               <div className="flex items-baseline gap-3">
                 {product.originalPrice && (
-                  <span className="text-base text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
+                  <span className="text-base text-muted-foreground line-through">KSH {product.originalPrice.toLocaleString()}</span>
                 )}
-                <span className="text-2xl font-bold text-foreground">${product.price.toFixed(2)}</span>
+                <span className="text-2xl font-bold text-foreground">KSH {product.price.toLocaleString()}</span>
               </div>
             ) : (
               <div className="bg-muted rounded-md px-4 py-3">

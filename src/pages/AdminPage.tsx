@@ -396,7 +396,7 @@ const CustomersTab = ({ orders }: any) => {
               <td className="p-3 font-medium text-foreground">{c.name}</td>
               <td className="p-3 text-muted-foreground text-xs">{c.email}</td>
               <td className="p-3 text-foreground">{c.orders}</td>
-              <td className="p-3 font-medium text-foreground">${c.total.toFixed(2)}</td>
+              <td className="p-3 font-medium text-foreground">KSH {c.total.toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
