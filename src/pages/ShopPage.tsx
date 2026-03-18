@@ -3,17 +3,32 @@ import StoreFooter from "@/components/store/StoreFooter";
 import MobileBottomNav from "@/components/store/MobileBottomNav";
 import ProductCard from "@/components/store/ProductCard";
 import { useStore } from "@/context/StoreContext";
-import { useState } from "react";
-import { categories } from "@/data/store";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { categories, carMakes, carModels, carYears, carClasses } from "@/data/store";
 
 const ShopPage = () => {
-  const { products, searchQuery } = useStore();
+  const { products, searchQuery, setSearchQuery } = useStore();
+  const [searchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [sortBy, setSortBy] = useState("default");
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+
+  // Vehicle filter state from URL params
+  const make = searchParams.get("make") || "";
+  const model = searchParams.get("model") || "";
+  const year = searchParams.get("year") || "";
+  const vehicleClass = searchParams.get("class") || "";
+  const hasVehicleFilter = !!(make || model || year || vehicleClass);
+
+  useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
 
   let filtered = products.filter((p) => {
     const matchesCategory = !selectedCategory || p.category === selectedCategory;
-    const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = localSearch || searchQuery;
+    const matchesSearch = !q || p.name.toLowerCase().includes(q.toLowerCase()) || p.category.toLowerCase().includes(q.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -25,8 +40,29 @@ const ShopPage = () => {
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       <StoreHeader />
       <div className="container py-6">
+        {hasVehicleFilter && (
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-4 text-sm text-foreground">
+            <span className="font-semibold">Vehicle Filter:</span>
+            {make && <span className="ml-2">{make}</span>}
+            {model && <span className="ml-1">{model}</span>}
+            {year && <span className="ml-1">({year})</span>}
+            {vehicleClass && <span className="ml-1">• {vehicleClass}</span>}
+            <span className="text-muted-foreground ml-2">— Showing all compatible parts</span>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <aside className="space-y-4">
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-3 text-foreground">Search</h3>
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={localSearch}
+                onChange={(e) => { setLocalSearch(e.target.value); setSearchQuery(e.target.value); }}
+                className="w-full border border-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+            </div>
             <div className="bg-card border border-border rounded-lg p-4">
               <h3 className="font-semibold text-sm mb-3 text-foreground">Categories</h3>
               <ul className="space-y-1.5">
@@ -38,16 +74,19 @@ const ShopPage = () => {
                     All Products ({products.length})
                   </button>
                 </li>
-                {categories.map((cat) => (
-                  <li key={cat.name}>
-                    <button
-                      onClick={() => setSelectedCategory(cat.name)}
-                      className={`text-xs w-full text-left py-1 px-2 rounded transition-colors ${selectedCategory === cat.name ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}
-                    >
-                      {cat.name}
-                    </button>
-                  </li>
-                ))}
+                {categories.map((cat) => {
+                  const count = products.filter((p) => p.category === cat.name).length;
+                  return (
+                    <li key={cat.name}>
+                      <button
+                        onClick={() => setSelectedCategory(cat.name)}
+                        className={`text-xs w-full text-left py-1 px-2 rounded transition-colors ${selectedCategory === cat.name ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}
+                      >
+                        {cat.icon} {cat.name} ({count})
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </aside>

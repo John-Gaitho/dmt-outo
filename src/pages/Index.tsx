@@ -22,7 +22,27 @@ const Index = () => (
     <ProductSection
       title="Brakes & Rotors"
       category="Brakes & Rotors"
-      subcategories={["Abs", "Accessories", "Brake Booster", "Brake Calipers", "Brake Cylinder"]}
+      subcategories={["ABS", "Accessories", "Brake Booster", "Brake Calipers", "Brake Cylinder"]}
+    />
+    <ProductSection
+      title="Engines & Components"
+      category="Engines & Components"
+      subcategories={["Engine Oil", "Filters", "Gaskets", "Pistons", "Timing Belts"]}
+    />
+    <ProductSection
+      title="Electrical"
+      category="Electrical"
+      subcategories={["Batteries", "Alternators", "Starters", "Wiring", "Fuses"]}
+    />
+    <ProductSection
+      title="Air & Fuel Delivery"
+      category="Air & Fuel Delivery"
+      subcategories={["Air Filters", "Fuel Pumps", "Carburetors", "Injectors"]}
+    />
+    <ProductSection
+      title="Exterior & Accessories"
+      category="Exterior & Accessories"
+      subcategories={["Mirrors", "Bumpers", "Fenders", "Grilles", "Wipers"]}
     />
     <StoreFooter />
     <MobileBottomNav />
