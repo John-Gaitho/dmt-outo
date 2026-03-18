@@ -13,7 +13,7 @@ const TopBar = () => {
         <span className="hidden md:inline">Hi! Welcome to DMT online store.</span>
         <div className="flex items-center gap-4">
           <Link to="/shop" className="hover:text-primary transition-colors">Catalogue</Link>
-          <Link to="/shop" className="hover:text-primary transition-colors hidden md:inline">FAQ</Link>
+          <Link to="/faq" className="hover:text-primary transition-colors hidden md:inline">FAQ</Link>
           {user ? (
             <>
               {isAdmin && <Link to="/admin" className="font-semibold hover:text-primary transition-colors">Admin Panel</Link>}
