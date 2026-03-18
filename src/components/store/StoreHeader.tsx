@@ -116,7 +116,7 @@ const Navigation = () => {
               className="px-4 py-3 text-sm font-medium text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
               {link.label}
-              {["Shop", "Category", "Pages", "Blog"].includes(link.label) && (
+              {link.label === "Shop" && (
                 <ChevronDown className="w-3 h-3" />
               )}
             </Link>
