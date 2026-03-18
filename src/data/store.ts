@@ -47,6 +47,7 @@ export interface Category {
   name: string;
   count: number;
   image: string;
+  icon: string;
 }
 
 /* ================= STATIC CATEGORIES ================= */
