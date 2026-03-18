@@ -99,10 +99,10 @@ const Navigation = () => {
   const navLinks = [
     { label: "Home", to: "/" },
     { label: "Shop", to: "/shop" },
-    { label: "Category", to: "/shop" },
-    { label: "Your Recently Viewed", to: "/shop" },
-    { label: "Pages", to: "/" },
-    { label: "Blog", to: "/" },
+    { label: "Blog", to: "/blog" },
+    { label: "About", to: "/about" },
+    { label: "Contact", to: "/contact" },
+    { label: "FAQ", to: "/faq" },
   ];
 
   return (
