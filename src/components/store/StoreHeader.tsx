@@ -13,7 +13,7 @@ const TopBar = () => {
         <span className="hidden md:inline">Hi! Welcome to DMT online store.</span>
         <div className="flex items-center gap-4">
           <Link to="/shop" className="hover:text-primary transition-colors">Catalogue</Link>
-          <Link to="/shop" className="hover:text-primary transition-colors hidden md:inline">FAQ</Link>
+          <Link to="/faq" className="hover:text-primary transition-colors hidden md:inline">FAQ</Link>
           {user ? (
             <>
               {isAdmin && <Link to="/admin" className="font-semibold hover:text-primary transition-colors">Admin Panel</Link>}
@@ -99,10 +99,10 @@ const Navigation = () => {
   const navLinks = [
     { label: "Home", to: "/" },
     { label: "Shop", to: "/shop" },
-    { label: "Category", to: "/shop" },
-    { label: "Your Recently Viewed", to: "/shop" },
-    { label: "Pages", to: "/" },
-    { label: "Blog", to: "/" },
+    { label: "Blog", to: "/blog" },
+    { label: "About", to: "/about" },
+    { label: "Contact", to: "/contact" },
+    { label: "FAQ", to: "/faq" },
   ];
 
   return (
@@ -116,7 +116,7 @@ const Navigation = () => {
               className="px-4 py-3 text-sm font-medium text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
               {link.label}
-              {["Shop", "Category", "Pages", "Blog"].includes(link.label) && (
+              {link.label === "Shop" && (
                 <ChevronDown className="w-3 h-3" />
               )}
             </Link>
