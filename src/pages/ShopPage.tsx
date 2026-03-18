@@ -5,7 +5,7 @@ import ProductCard from "@/components/store/ProductCard";
 import { useStore } from "@/context/StoreContext";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { categories, carMakes, carModels, carYears, carClasses } from "@/data/store";
+import { categories } from "@/data/store";
 
 const ShopPage = () => {
   const { products, searchQuery, setSearchQuery } = useStore();
@@ -14,12 +14,25 @@ const ShopPage = () => {
   const [sortBy, setSortBy] = useState("default");
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
-  // Vehicle filter state from URL params
+  // Read URL params
   const make = searchParams.get("make") || "";
   const model = searchParams.get("model") || "";
   const year = searchParams.get("year") || "";
   const vehicleClass = searchParams.get("class") || "";
+  const urlCategory = searchParams.get("category") || "";
+  const urlQuery = searchParams.get("q") || "";
   const hasVehicleFilter = !!(make || model || year || vehicleClass);
+
+  useEffect(() => {
+    if (urlCategory) setSelectedCategory(urlCategory);
+  }, [urlCategory]);
+
+  useEffect(() => {
+    if (urlQuery) {
+      setLocalSearch(urlQuery);
+      setSearchQuery(urlQuery);
+    }
+  }, [urlQuery]);
 
   useEffect(() => {
     setLocalSearch(searchQuery);
@@ -28,7 +41,7 @@ const ShopPage = () => {
   let filtered = products.filter((p) => {
     const matchesCategory = !selectedCategory || p.category === selectedCategory;
     const q = localSearch || searchQuery;
-    const matchesSearch = !q || p.name.toLowerCase().includes(q.toLowerCase()) || p.category.toLowerCase().includes(q.toLowerCase());
+    const matchesSearch = !q || p.name.toLowerCase().includes(q.toLowerCase()) || p.category.toLowerCase().includes(q.toLowerCase()) || (p.description || "").toLowerCase().includes(q.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -67,10 +80,8 @@ const ShopPage = () => {
               <h3 className="font-semibold text-sm mb-3 text-foreground">Categories</h3>
               <ul className="space-y-1.5">
                 <li>
-                  <button
-                    onClick={() => setSelectedCategory("")}
-                    className={`text-xs w-full text-left py-1 px-2 rounded transition-colors ${!selectedCategory ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}
-                  >
+                  <button onClick={() => setSelectedCategory("")}
+                    className={`text-xs w-full text-left py-1 px-2 rounded transition-colors ${!selectedCategory ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}>
                     All Products ({products.length})
                   </button>
                 </li>
@@ -78,11 +89,9 @@ const ShopPage = () => {
                   const count = products.filter((p) => p.category === cat.name).length;
                   return (
                     <li key={cat.name}>
-                      <button
-                        onClick={() => setSelectedCategory(cat.name)}
-                        className={`text-xs w-full text-left py-1 px-2 rounded transition-colors ${selectedCategory === cat.name ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}
-                      >
-                        {cat.icon} {cat.name} ({count})
+                      <button onClick={() => setSelectedCategory(cat.name)}
+                        className={`text-xs w-full text-left py-1 px-2 rounded transition-colors ${selectedCategory === cat.name ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground hover:text-foreground"}`}>
+                        {cat.name} ({count})
                       </button>
                     </li>
                   );

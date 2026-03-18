@@ -1,5 +1,5 @@
 import { Search, HelpCircle, Heart, ShoppingCart, User, ChevronDown, Menu, X, LogOut } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "@/context/StoreContext";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
@@ -30,6 +30,17 @@ const TopBar = () => {
 
 const HeaderMain = () => {
   const { cartCount, cartTotal, wishlist, searchQuery, setSearchQuery } = useStore();
+  const navigate = useNavigate();
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+
+  const handleSearch = () => {
+    setSearchQuery(localSearch);
+    navigate(`/shop?q=${encodeURIComponent(localSearch)}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSearch();
+  };
 
   return (
     <div className="bg-card border-b border-border py-3">
@@ -51,12 +62,13 @@ const HeaderMain = () => {
             <input
               type="text"
               placeholder="Search for products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="w-full border border-border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary md:border-l-0"
             />
           </div>
-          <button className="bg-primary text-primary-foreground px-4 py-2 rounded-r hover:opacity-90 transition-opacity">
+          <button onClick={handleSearch} className="bg-primary text-primary-foreground px-4 py-2 rounded-r hover:opacity-90 transition-opacity">
             <Search className="w-4 h-4" />
           </button>
         </div>
@@ -116,9 +128,7 @@ const Navigation = () => {
               className="px-4 py-3 text-sm font-medium text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
               {link.label}
-              {link.label === "Shop" && (
-                <ChevronDown className="w-3 h-3" />
-              )}
+              {link.label === "Shop" && <ChevronDown className="w-3 h-3" />}
             </Link>
           ))}
         </div>
@@ -133,18 +143,10 @@ const Navigation = () => {
       {mobileOpen && (
         <div className="md:hidden border-t border-border">
           {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              to={link.to}
-              className="block px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-              onClick={() => setMobileOpen(false)}
-            >
+            <Link key={link.label} to={link.to} className="block px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors" onClick={() => setMobileOpen(false)}>
               {link.label}
             </Link>
           ))}
-          <Link to="/admin" className="block px-4 py-3 text-sm font-semibold text-primary" onClick={() => setMobileOpen(false)}>
-            Admin Panel
-          </Link>
         </div>
       )}
     </nav>
