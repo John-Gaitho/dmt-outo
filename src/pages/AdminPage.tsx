@@ -1,11 +1,13 @@
 import { useState, useRef } from "react";
 import { useStore } from "@/context/StoreContext";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 import { Link, Navigate } from "react-router-dom";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut,
   Plus, Edit, Trash2, ChevronDown, TrendingUp, DollarSign, Eye, Upload, X, Image,
-  FileDown, BarChart3, Activity, Calendar, CheckCircle, Clock, XCircle, AlertTriangle
+  FileDown, BarChart3, Activity, Calendar, CheckCircle, Clock, XCircle, AlertTriangle,
+  Sun, Moon, AlertCircle, PackageX, Boxes
 } from "lucide-react";
 import { Product } from "@/data/store";
 import { toast } from "sonner";
@@ -19,6 +21,7 @@ type Tab = "dashboard" | "products" | "orders" | "customers" | "reports" | "sett
 const AdminPage = () => {
   const { products, orders, addProduct, updateProduct, deleteProduct, updateOrderStatus } = useStore();
   const { user, isAdmin, isLoading, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showProductForm, setShowProductForm] = useState(false);
@@ -43,6 +46,7 @@ const AdminPage = () => {
   const pendingOrders = orders.filter(o => o.status === "pending").length;
   const deliveredOrders = orders.filter(o => o.status === "delivered").length;
   const inStockProducts = products.filter(p => p.inStock).length;
+  const lowStockProducts = products.filter(p => p.inStock && p.reviews <= 5);
 
   const sidebarItems: { icon: typeof LayoutDashboard; label: string; tab: Tab }[] = [
     { icon: LayoutDashboard, label: "Dashboard", tab: "dashboard" },
@@ -85,6 +89,10 @@ const AdminPage = () => {
           ))}
         </nav>
         <div className="p-4 border-t border-secondary-foreground/10 space-y-2">
+          <button onClick={toggleTheme} className="flex items-center gap-3 text-sm text-secondary-foreground/70 hover:text-secondary-foreground transition-colors w-full">
+            {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            {sidebarOpen && (theme === "light" ? "Dark Mode" : "Light Mode")}
+          </button>
           <button onClick={signOut} className="flex items-center gap-3 text-sm text-secondary-foreground/70 hover:text-secondary-foreground transition-colors w-full">
             <LogOut className="w-4 h-4" />
             {sidebarOpen && "Sign Out"}
@@ -114,6 +122,12 @@ const AdminPage = () => {
             <p className="text-xs text-muted-foreground">Manage your store</p>
           </div>
           <div className="flex items-center gap-2">
+            {lowStockProducts.length > 0 && (
+              <button onClick={() => setActiveTab("products")} className="flex items-center gap-1.5 bg-warning/10 text-warning px-3 py-1.5 rounded-lg text-xs font-semibold animate-pulse">
+                <AlertCircle className="w-3.5 h-3.5" />
+                {lowStockProducts.length} Low Stock
+              </button>
+            )}
             <span className="text-xs text-muted-foreground hidden md:inline">{user?.email}</span>
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="hidden md:block p-2 border border-border rounded hover:bg-muted transition-colors">
               <ChevronDown className={`w-4 h-4 transition-transform ${sidebarOpen ? "rotate-90" : "-rotate-90"}`} />
@@ -122,7 +136,7 @@ const AdminPage = () => {
         </header>
 
         <div className="p-4 md:p-6">
-          {activeTab === "dashboard" && <DashboardTab totalRevenue={totalRevenue} totalOrders={totalOrders} totalProducts={totalProducts} pendingOrders={pendingOrders} deliveredOrders={deliveredOrders} inStockProducts={inStockProducts} orders={orders} products={products} />}
+          {activeTab === "dashboard" && <DashboardTab totalRevenue={totalRevenue} totalOrders={totalOrders} totalProducts={totalProducts} pendingOrders={pendingOrders} deliveredOrders={deliveredOrders} inStockProducts={inStockProducts} orders={orders} products={products} lowStockProducts={lowStockProducts} />}
           {activeTab === "products" && (
             <ProductsTab products={products}
               onEdit={(p: Product) => { setEditingProduct(p); setShowProductForm(true); }}
@@ -131,6 +145,7 @@ const AdminPage = () => {
               showForm={showProductForm} editingProduct={editingProduct}
               onSave={handleSaveProduct}
               onCancel={() => { setShowProductForm(false); setEditingProduct(null); }}
+              lowStockProducts={lowStockProducts}
             />
           )}
           {activeTab === "orders" && <OrdersTab orders={orders} onUpdateStatus={updateOrderStatus} />}
@@ -158,7 +173,7 @@ const StatCard = ({ title, value, icon: Icon, trend, color }: { title: string; v
 );
 
 /* ============ DASHBOARD ============ */
-const DashboardTab = ({ totalRevenue, totalOrders, totalProducts, pendingOrders, deliveredOrders, inStockProducts, orders, products }: any) => (
+const DashboardTab = ({ totalRevenue, totalOrders, totalProducts, pendingOrders, deliveredOrders, inStockProducts, orders, products, lowStockProducts }: any) => (
   <div className="space-y-6">
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard title="Total Revenue" value={`KSH ${totalRevenue.toLocaleString()}`} icon={DollarSign} trend="12% from last month" color="bg-green-500" />
@@ -166,6 +181,30 @@ const DashboardTab = ({ totalRevenue, totalOrders, totalProducts, pendingOrders,
       <StatCard title="Total Products" value={totalProducts.toString()} icon={Package} color="bg-purple-500" />
       <StatCard title="In Stock" value={`${inStockProducts}/${totalProducts}`} icon={CheckCircle} color="bg-amber-500" />
     </div>
+
+    {/* Low Stock Alert */}
+    {lowStockProducts.length > 0 && (
+      <div className="bg-warning/5 border border-warning/20 rounded-xl p-5">
+        <h3 className="font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-warning" /> Low Stock Alert — {lowStockProducts.length} Products Running Low
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {lowStockProducts.map((p: Product) => (
+            <div key={p.id} className="bg-card border border-border rounded-lg p-3 flex items-center gap-3">
+              <img src={p.images?.[0] || p.image} alt={p.name} className="w-12 h-12 rounded-lg object-contain bg-muted p-1" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-foreground truncate">{p.name}</p>
+                <p className="text-[10px] text-muted-foreground">{p.category}</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <PackageX className="w-3 h-3 text-warning" />
+                  <span className="text-[10px] font-semibold text-warning">Low stock — reorder soon</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
 
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {/* Order Status Summary */}
@@ -206,26 +245,52 @@ const DashboardTab = ({ totalRevenue, totalOrders, totalProducts, pendingOrders,
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Inventory Overview */}
       <div className="bg-card border border-border rounded-xl p-5">
-        <h3 className="font-semibold text-sm text-foreground mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 gap-2">
-          <Link to="/shop" className="bg-muted rounded-lg p-3 text-center hover:bg-primary/10 transition-colors">
-            <Eye className="w-5 h-5 mx-auto mb-1 text-primary" />
-            <span className="text-[10px] font-medium text-foreground">View Store</span>
-          </Link>
-          <button className="bg-muted rounded-lg p-3 text-center hover:bg-primary/10 transition-colors">
-            <FileDown className="w-5 h-5 mx-auto mb-1 text-primary" />
-            <span className="text-[10px] font-medium text-foreground">Export PDF</span>
-          </button>
-          <button className="bg-muted rounded-lg p-3 text-center hover:bg-primary/10 transition-colors">
-            <Package className="w-5 h-5 mx-auto mb-1 text-primary" />
-            <span className="text-[10px] font-medium text-foreground">Inventory</span>
-          </button>
-          <button className="bg-muted rounded-lg p-3 text-center hover:bg-primary/10 transition-colors">
-            <BarChart3 className="w-5 h-5 mx-auto mb-1 text-primary" />
-            <span className="text-[10px] font-medium text-foreground">Analytics</span>
-          </button>
+        <h3 className="font-semibold text-sm text-foreground mb-4 flex items-center gap-2"><Boxes className="w-4 h-4" /> Inventory Overview</h3>
+        <div className="space-y-3">
+          {(() => {
+            const cats = products.reduce((acc: Record<string, number>, p: Product) => {
+              acc[p.category] = (acc[p.category] || 0) + 1;
+              return acc;
+            }, {});
+            return Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([cat, count]) => (
+              <div key={cat} className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground truncate flex-1">{cat}</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-20 h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-primary rounded-full" style={{ width: `${(count as number / products.length) * 100}%` }} />
+                  </div>
+                  <span className="text-xs font-semibold text-foreground w-6 text-right">{count as number}</span>
+                </div>
+              </div>
+            ));
+          })()}
+        </div>
+      </div>
+    </div>
+
+    {/* Daily Sales Summary */}
+    <div className="bg-card border border-border rounded-xl p-5">
+      <h3 className="font-semibold text-sm text-foreground mb-4 flex items-center gap-2">
+        <Calendar className="w-4 h-4" /> Today's Sales Summary
+      </h3>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div className="bg-muted rounded-lg p-3 text-center">
+          <p className="text-2xl font-bold text-foreground">{orders.filter((o: any) => o.date === new Date().toISOString().split("T")[0]).length || orders.length}</p>
+          <p className="text-[10px] text-muted-foreground">Orders Today</p>
+        </div>
+        <div className="bg-muted rounded-lg p-3 text-center">
+          <p className="text-2xl font-bold text-foreground">KSH {totalRevenue.toLocaleString()}</p>
+          <p className="text-[10px] text-muted-foreground">Revenue Today</p>
+        </div>
+        <div className="bg-muted rounded-lg p-3 text-center">
+          <p className="text-2xl font-bold text-foreground">{products.filter((p: Product) => !p.inStock).length}</p>
+          <p className="text-[10px] text-muted-foreground">Out of Stock</p>
+        </div>
+        <div className="bg-muted rounded-lg p-3 text-center">
+          <p className="text-2xl font-bold text-foreground">{lowStockProducts.length}</p>
+          <p className="text-[10px] text-muted-foreground">Low Stock Items</p>
         </div>
       </div>
     </div>
@@ -257,9 +322,9 @@ const DashboardTab = ({ totalRevenue, totalOrders, totalProducts, pendingOrders,
 const StatusBadge = ({ status }: { status: string }) => {
   const styles: Record<string, string> = {
     pending: "bg-warning/10 text-warning border-warning/20",
-    processing: "bg-blue-50 text-blue-600 border-blue-200",
-    shipped: "bg-indigo-50 text-indigo-600 border-indigo-200",
-    delivered: "bg-green-50 text-green-600 border-green-200",
+    processing: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    shipped: "bg-indigo-500/10 text-indigo-500 border-indigo-500/20",
+    delivered: "bg-green-500/10 text-green-500 border-green-500/20",
     cancelled: "bg-destructive/10 text-destructive border-destructive/20",
   };
   return (
@@ -270,7 +335,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 /* ============ PRODUCTS TAB ============ */
-const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProduct, onSave, onCancel }: any) => {
+const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProduct, onSave, onCancel, lowStockProducts }: any) => {
   const [formData, setFormData] = useState<Partial<Product>>({
     name: "", price: 0, category: "", description: "", subcategory: "",
     featured: false, deal: false, discount: undefined, originalPrice: undefined, inStock: true,
@@ -278,6 +343,7 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [filterLowStock, setFilterLowStock] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const startEdit = (p: Product | null) => {
@@ -333,11 +399,21 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
   };
 
   const categoryOptions = ["Air & Fuel Delivery", "Exterior & Accessories", "Headlights & Lighting", "Brakes & Rotors", "Engines & Components", "Electrical", "Interior", "Suspension"];
+  const displayProducts = filterLowStock ? lowStockProducts : products;
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{products.length} products</p>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-muted-foreground">{products.length} products</p>
+          {lowStockProducts.length > 0 && (
+            <button onClick={() => setFilterLowStock(!filterLowStock)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${filterLowStock ? "bg-warning text-warning-foreground" : "bg-warning/10 text-warning hover:bg-warning/20"}`}>
+              <AlertCircle className="w-3 h-3" />
+              {filterLowStock ? "Show All" : `${lowStockProducts.length} Low Stock`}
+            </button>
+          )}
+        </div>
         <button onClick={() => { onAdd(); startEdit(null); }} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 hover:opacity-90 transition-opacity shadow-sm">
           <Plus className="w-3.5 h-3.5" /> Add Product
         </button>
@@ -346,17 +422,16 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
       {showForm && (
         <div className="bg-card border border-border rounded-xl p-5 space-y-4">
           <h3 className="font-semibold text-foreground">{editingProduct ? "Edit Product" : "Add New Product"}</h3>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Product Name *</label>
               <input placeholder="e.g. LED Headlight Bulb H7" value={formData.name || ""} onChange={e => setFormData({ ...formData, name: e.target.value })}
-                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Category *</label>
               <select value={formData.category || ""} onChange={e => setFormData({ ...formData, category: e.target.value })}
-                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                 <option value="">Select Category</option>
                 {categoryOptions.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -364,51 +439,48 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Subcategory</label>
               <input placeholder="e.g. Bulbs, Brake Pads" value={formData.subcategory || ""} onChange={e => setFormData({ ...formData, subcategory: e.target.value })}
-                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background" />
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Price (KSH) *</label>
                 <input type="number" placeholder="0" value={formData.price || ""} onChange={e => setFormData({ ...formData, price: Number(e.target.value) })}
-                  className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background" />
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground" />
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Original Price</label>
                 <input type="number" placeholder="0" value={formData.originalPrice || ""} onChange={e => setFormData({ ...formData, originalPrice: Number(e.target.value) || undefined })}
-                  className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background" />
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground" />
               </div>
             </div>
           </div>
-
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1 block">Description</label>
             <textarea placeholder="Product description..." value={formData.description || ""} onChange={e => setFormData({ ...formData, description: e.target.value })}
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background" rows={3} />
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground" rows={3} />
           </div>
-
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Discount %</label>
               <input type="number" placeholder="0" value={formData.discount || ""} onChange={e => setFormData({ ...formData, discount: Number(e.target.value) || undefined })}
-                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background" />
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground" />
             </div>
-            <label className="flex items-center gap-2 text-sm cursor-pointer mt-5">
+            <label className="flex items-center gap-2 text-sm cursor-pointer mt-5 text-foreground">
               <input type="checkbox" checked={formData.featured || false} onChange={e => setFormData({ ...formData, featured: e.target.checked })}
                 className="rounded border-border" /> Featured
             </label>
-            <label className="flex items-center gap-2 text-sm cursor-pointer mt-5">
+            <label className="flex items-center gap-2 text-sm cursor-pointer mt-5 text-foreground">
               <input type="checkbox" checked={formData.deal || false} onChange={e => setFormData({ ...formData, deal: e.target.checked })}
                 className="rounded border-border" /> Deal
             </label>
-            <label className="flex items-center gap-2 text-sm cursor-pointer mt-5">
+            <label className="flex items-center gap-2 text-sm cursor-pointer mt-5 text-foreground">
               <input type="checkbox" checked={formData.inStock !== false} onChange={e => setFormData({ ...formData, inStock: e.target.checked })}
                 className="rounded border-border" /> In Stock
             </label>
           </div>
-
           {/* Image Upload */}
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-2 block flex items-center gap-1"><Image className="w-3 h-3" /> Product Images (up to 5)</label>
+            <label className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1"><Image className="w-3 h-3" /> Product Images (up to 5)</label>
             <div className="flex flex-wrap gap-3">
               {imagePreviews.map((preview, i) => (
                 <div key={i} className="relative w-24 h-24 border border-border rounded-xl overflow-hidden bg-muted">
@@ -428,12 +500,11 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
             </div>
             <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageSelect} className="hidden" />
           </div>
-
           <div className="flex gap-2 pt-2">
             <button onClick={handleSave} disabled={uploading} className="bg-primary text-primary-foreground px-6 py-2.5 rounded-lg text-sm font-semibold disabled:opacity-50 shadow-sm">
               {uploading ? "Uploading..." : editingProduct ? "Update Product" : "Add Product"}
             </button>
-            <button onClick={onCancel} className="border border-border px-6 py-2.5 rounded-lg text-sm hover:bg-muted transition-colors">Cancel</button>
+            <button onClick={onCancel} className="border border-border px-6 py-2.5 rounded-lg text-sm hover:bg-muted transition-colors text-foreground">Cancel</button>
           </div>
         </div>
       )}
@@ -444,8 +515,8 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
             <th className="p-3 font-medium">Product</th><th className="p-3 font-medium">Category</th><th className="p-3 font-medium">Price</th><th className="p-3 font-medium">Images</th><th className="p-3 font-medium">Stock</th><th className="p-3 font-medium">Featured</th><th className="p-3 font-medium">Actions</th>
           </tr></thead>
           <tbody>
-            {products.map((p: Product) => (
-              <tr key={p.id} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
+            {displayProducts.map((p: Product) => (
+              <tr key={p.id} className={`border-b border-border/50 hover:bg-muted/50 transition-colors ${lowStockProducts.some((lp: Product) => lp.id === p.id) ? "bg-warning/5" : ""}`}>
                 <td className="p-3 flex items-center gap-3">
                   <img src={p.images?.[0] || p.image} alt={p.name} className="w-12 h-12 object-contain rounded-lg bg-muted p-1" />
                   <div>
@@ -459,8 +530,13 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
                   {p.originalPrice && <span className="text-[10px] text-muted-foreground line-through ml-1">KSH {p.originalPrice.toLocaleString()}</span>}
                 </td>
                 <td className="p-3 text-xs text-muted-foreground">{p.images?.length || 1}</td>
-                <td className="p-3"><span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${p.inStock ? "bg-green-50 text-green-600" : "bg-destructive/10 text-destructive"}`}>{p.inStock ? "In Stock" : "Out"}</span></td>
-                <td className="p-3">{p.featured && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">Featured</span>}{p.deal && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-warning/10 text-warning ml-1">Deal</span>}</td>
+                <td className="p-3">
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${p.inStock ? "bg-green-500/10 text-green-500" : "bg-destructive/10 text-destructive"}`}>{p.inStock ? "In Stock" : "Out"}</span>
+                </td>
+                <td className="p-3">
+                  {p.featured && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">Featured</span>}
+                  {p.deal && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-warning/10 text-warning ml-1">Deal</span>}
+                </td>
                 <td className="p-3 flex gap-1">
                   <button onClick={() => { onEdit(p); startEdit(p); }} className="p-2 border border-border rounded-lg hover:bg-muted transition-colors"><Edit className="w-3.5 h-3.5" /></button>
                   <button onClick={() => onDelete(p.id)} className="p-2 border border-border rounded-lg hover:bg-destructive/10 text-destructive transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
@@ -479,20 +555,28 @@ const OrdersTab = ({ orders, onUpdateStatus }: any) => (
   <div className="bg-card border border-border rounded-xl overflow-x-auto">
     <table className="w-full text-sm min-w-[600px]">
       <thead><tr className="border-b border-border bg-muted/50 text-left text-xs text-muted-foreground">
-        <th className="p-3 font-medium">Order ID</th><th className="p-3 font-medium">Customer</th><th className="p-3 font-medium">Total</th><th className="p-3 font-medium">Status</th><th className="p-3 font-medium">Date</th><th className="p-3 font-medium">Actions</th>
+        <th className="p-3 font-medium">Order ID</th><th className="p-3 font-medium">Customer</th><th className="p-3 font-medium">Items</th><th className="p-3 font-medium">Total</th><th className="p-3 font-medium">Status</th><th className="p-3 font-medium">Date</th><th className="p-3 font-medium">Actions</th>
       </tr></thead>
       <tbody>
         {orders.map((order: any) => (
           <tr key={order.id} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
             <td className="p-3 font-medium text-foreground">{order.id}</td>
-            <td className="p-3 text-muted-foreground">{order.customer}</td>
+            <td className="p-3">
+              <p className="text-foreground text-xs font-medium">{order.customer}</p>
+              <p className="text-[10px] text-muted-foreground">{order.email}</p>
+            </td>
+            <td className="p-3">
+              {order.items.map((item: any, i: number) => (
+                <p key={i} className="text-[10px] text-muted-foreground">{item.product.name} × {item.quantity}</p>
+              ))}
+            </td>
             <td className="p-3 font-medium text-foreground">KSH {order.total.toLocaleString()}</td>
             <td className="p-3"><StatusBadge status={order.status} /></td>
             <td className="p-3 text-muted-foreground text-xs">{order.date}</td>
             <td className="p-3">
               <select value={order.status}
                 onChange={e => { onUpdateStatus(order.id, e.target.value); toast.success(`Order ${order.id} updated`); }}
-                className="border border-border rounded-lg px-2 py-1 text-xs bg-background">
+                className="border border-border rounded-lg px-2 py-1 text-xs bg-background text-foreground">
                 <option value="pending">Pending</option>
                 <option value="processing">Processing</option>
                 <option value="shipped">Shipped</option>
@@ -543,11 +627,12 @@ const ReportsTab = ({ orders, products }: { orders: any[]; products: Product[] }
 
   const totalRevenue = orders.reduce((s: number, o: any) => s + o.total, 0);
   const avgOrderValue = orders.length ? totalRevenue / orders.length : 0;
+  const outOfStockProducts = products.filter(p => !p.inStock);
+  const lowStockProducts = products.filter(p => p.inStock && p.reviews <= 5);
 
   const generatePDF = () => {
     const doc = new jsPDF();
 
-    // Header
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
     doc.text("DMT Auto Parts", 14, 22);
@@ -556,7 +641,6 @@ const ReportsTab = ({ orders, products }: { orders: any[]; products: Product[] }
     doc.text(`Sales Report — ${reportDate}`, 14, 30);
     doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 36);
 
-    // Summary
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.text("Summary", 14, 50);
@@ -567,32 +651,37 @@ const ReportsTab = ({ orders, products }: { orders: any[]; products: Product[] }
     doc.text(`Average Order Value: KSH ${avgOrderValue.toFixed(0)}`, 14, 70);
     doc.text(`Total Products: ${products.length}`, 14, 76);
     doc.text(`In Stock: ${products.filter(p => p.inStock).length}`, 14, 82);
+    doc.text(`Out of Stock: ${outOfStockProducts.length}`, 14, 88);
+    doc.text(`Low Stock Items: ${lowStockProducts.length}`, 14, 94);
 
     if (reportNotes) {
       doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
-      doc.text("Notes", 14, 96);
+      doc.text("Notes", 14, 108);
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
       const lines = doc.splitTextToSize(reportNotes, 180);
-      doc.text(lines, 14, 104);
+      doc.text(lines, 14, 116);
     }
 
-    // Orders Table
-    const startY = reportNotes ? 104 + doc.splitTextToSize(reportNotes, 180).length * 6 + 10 : 96;
+    const startY = reportNotes ? 116 + doc.splitTextToSize(reportNotes, 180).length * 6 + 10 : 108;
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.text("Orders", 14, startY);
+    doc.text("Orders Details", 14, startY);
 
     autoTable(doc, {
       startY: startY + 6,
-      head: [["Order ID", "Customer", "Total (KSH)", "Status", "Date"]],
-      body: orders.map((o: any) => [o.id, o.customer, o.total.toLocaleString(), o.status, o.date]),
-      styles: { fontSize: 8 },
+      head: [["Order ID", "Customer", "Email", "Items", "Total (KSH)", "Status", "Date"]],
+      body: orders.map((o: any) => [
+        o.id, o.customer, o.email,
+        o.items.map((i: any) => `${i.product.name} x${i.quantity}`).join(", "),
+        o.total.toLocaleString(), o.status, o.date
+      ]),
+      styles: { fontSize: 7 },
       headStyles: { fillColor: [41, 128, 185] },
     });
 
-    // Products table on new page
+    // Products inventory page
     doc.addPage();
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
@@ -600,11 +689,30 @@ const ReportsTab = ({ orders, products }: { orders: any[]; products: Product[] }
 
     autoTable(doc, {
       startY: 28,
-      head: [["Product", "Category", "Price (KSH)", "Stock", "Rating"]],
-      body: products.map(p => [p.name, p.category, p.price.toLocaleString(), p.inStock ? "In Stock" : "Out", `${p.rating}/5`]),
-      styles: { fontSize: 8 },
+      head: [["Product", "Category", "Price (KSH)", "Stock", "Rating", "Reviews"]],
+      body: products.map(p => [p.name, p.category, p.price.toLocaleString(), p.inStock ? "In Stock" : "Out of Stock", `${p.rating}/5`, p.reviews.toString()]),
+      styles: { fontSize: 7 },
       headStyles: { fillColor: [41, 128, 185] },
     });
+
+    // Low stock alert page
+    if (lowStockProducts.length > 0) {
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("Low Stock Alert", 14, 22);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${lowStockProducts.length} products need restocking`, 14, 30);
+
+      autoTable(doc, {
+        startY: 36,
+        head: [["Product", "Category", "Price (KSH)", "Reviews (Stock Indicator)"]],
+        body: lowStockProducts.map(p => [p.name, p.category, p.price.toLocaleString(), p.reviews.toString()]),
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [230, 126, 34] },
+      });
+    }
 
     doc.save(`DMT-Sales-Report-${reportDate}.pdf`);
     toast.success("PDF report downloaded!");
@@ -616,7 +724,34 @@ const ReportsTab = ({ orders, products }: { orders: any[]; products: Product[] }
         <StatCard title="Total Revenue" value={`KSH ${totalRevenue.toLocaleString()}`} icon={DollarSign} color="bg-green-500" />
         <StatCard title="Total Orders" value={orders.length.toString()} icon={ShoppingCart} color="bg-blue-500" />
         <StatCard title="Avg. Order Value" value={`KSH ${avgOrderValue.toFixed(0)}`} icon={TrendingUp} color="bg-purple-500" />
-        <StatCard title="Products" value={products.length.toString()} icon={Package} color="bg-amber-500" />
+        <StatCard title="Low Stock" value={lowStockProducts.length.toString()} icon={AlertCircle} color="bg-amber-500" />
+      </div>
+
+      {/* Products Sold Today */}
+      <div className="bg-card border border-border rounded-xl p-5">
+        <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+          <Calendar className="w-4 h-4" /> Products Sold — Details
+        </h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[500px]">
+            <thead><tr className="border-b border-border text-left text-xs text-muted-foreground">
+              <th className="pb-3 font-medium">Product</th><th className="pb-3 font-medium">Qty Sold</th><th className="pb-3 font-medium">Revenue</th><th className="pb-3 font-medium">Order</th>
+            </tr></thead>
+            <tbody>
+              {orders.flatMap((o: any) => o.items.map((item: any, i: number) => (
+                <tr key={`${o.id}-${i}`} className="border-b border-border/50 hover:bg-muted/50">
+                  <td className="py-2.5 flex items-center gap-2">
+                    <img src={item.product.images?.[0] || item.product.image} alt="" className="w-8 h-8 rounded bg-muted object-contain p-0.5" />
+                    <span className="text-xs text-foreground truncate max-w-[200px]">{item.product.name}</span>
+                  </td>
+                  <td className="py-2.5 text-xs text-foreground font-medium">{item.quantity}</td>
+                  <td className="py-2.5 text-xs text-foreground font-medium">KSH {(item.product.price * item.quantity).toLocaleString()}</td>
+                  <td className="py-2.5 text-xs text-muted-foreground">{o.id}</td>
+                </tr>
+              )))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="bg-card border border-border rounded-xl p-5 space-y-4">
@@ -625,14 +760,14 @@ const ReportsTab = ({ orders, products }: { orders: any[]; products: Product[] }
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1 block">Report Date</label>
             <input type="date" value={reportDate} onChange={e => setReportDate(e.target.value)}
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background" />
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground" />
           </div>
         </div>
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1 block">Notes / Comments</label>
           <textarea value={reportNotes} onChange={e => setReportNotes(e.target.value)}
             placeholder="Add notes about today's sales, highlights, issues..."
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background" rows={4} />
+            className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground" rows={4} />
         </div>
         <button onClick={generatePDF} className="bg-primary text-primary-foreground px-6 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
           <FileDown className="w-4 h-4" /> Download PDF Report
@@ -666,23 +801,38 @@ const ReportsTab = ({ orders, products }: { orders: any[]; products: Product[] }
 };
 
 /* ============ SETTINGS TAB ============ */
-const SettingsTab = ({ onSignOut }: { onSignOut: () => void }) => (
-  <div className="space-y-4">
-    <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-      <h3 className="font-semibold text-foreground">Store Settings</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div><label className="text-xs text-muted-foreground block mb-1">Store Name</label><input defaultValue="DMT Auto Parts" className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background" /></div>
-        <div><label className="text-xs text-muted-foreground block mb-1">Contact Email</label><input defaultValue="support@dmtautoparts.com" className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background" /></div>
-        <div><label className="text-xs text-muted-foreground block mb-1">Phone</label><input defaultValue="+254 700 000 000" className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background" /></div>
-        <div><label className="text-xs text-muted-foreground block mb-1">Currency</label><input defaultValue="KSH" className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background" disabled /></div>
+const SettingsTab = ({ onSignOut }: { onSignOut: () => void }) => {
+  const { theme, toggleTheme } = useTheme();
+  return (
+    <div className="space-y-4">
+      <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+        <h3 className="font-semibold text-foreground">Store Settings</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div><label className="text-xs text-muted-foreground block mb-1">Store Name</label><input defaultValue="DMT Auto Parts" className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground" /></div>
+          <div><label className="text-xs text-muted-foreground block mb-1">Contact Email</label><input defaultValue="support@dmtautoparts.com" className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground" /></div>
+          <div><label className="text-xs text-muted-foreground block mb-1">Phone</label><input defaultValue="+254 700 000 000" className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground" /></div>
+          <div><label className="text-xs text-muted-foreground block mb-1">Currency</label><input defaultValue="KSH" className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground" disabled /></div>
+        </div>
+        <button className="bg-primary text-primary-foreground px-6 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm">Save Settings</button>
       </div>
-      <button className="bg-primary text-primary-foreground px-6 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm">Save Settings</button>
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h3 className="font-semibold text-foreground mb-4">Appearance</h3>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-foreground">Dark Mode</p>
+            <p className="text-xs text-muted-foreground">Switch between light and dark themes</p>
+          </div>
+          <button onClick={toggleTheme} className={`relative w-12 h-6 rounded-full transition-colors ${theme === "dark" ? "bg-primary" : "bg-muted"}`}>
+            <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${theme === "dark" ? "translate-x-6" : "translate-x-0.5"}`} />
+          </button>
+        </div>
+      </div>
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h3 className="font-semibold text-foreground mb-4">Account</h3>
+        <button onClick={onSignOut} className="bg-destructive text-destructive-foreground px-6 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">Sign Out</button>
+      </div>
     </div>
-    <div className="bg-card border border-border rounded-xl p-6">
-      <h3 className="font-semibold text-foreground mb-4">Account</h3>
-      <button onClick={onSignOut} className="bg-destructive text-destructive-foreground px-6 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">Sign Out</button>
-    </div>
-  </div>
-);
+  );
+};
 
 export default AdminPage;
