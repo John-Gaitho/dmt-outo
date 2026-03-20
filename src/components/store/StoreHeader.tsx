@@ -109,6 +109,7 @@ const HeaderMain = () => {
 
 const Navigation = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const navLinks = [
     { label: "Home", to: "/" },
     { label: "Shop", to: "/shop" },
@@ -134,6 +135,9 @@ const Navigation = () => {
           ))}
         </div>
         <div className="hidden md:flex items-center gap-3 text-sm text-muted-foreground">
+          <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-muted transition-colors" aria-label="Toggle theme">
+            {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+          </button>
           <span>KSH</span>
           <span>English</span>
         </div>
