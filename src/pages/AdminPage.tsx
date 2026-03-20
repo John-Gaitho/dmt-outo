@@ -254,12 +254,12 @@ const DashboardTab = ({ totalRevenue, totalOrders, totalProducts, pendingOrders,
               acc[p.category] = (acc[p.category] || 0) + 1;
               return acc;
             }, {});
-            return Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([cat, count]) => (
+            return Object.entries(cats).sort((a, b) => (b[1] as number) - (a[1] as number)).slice(0, 6).map(([cat, count]) => (
               <div key={cat} className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground truncate flex-1">{cat}</span>
                 <div className="flex items-center gap-2">
                   <div className="w-20 h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary rounded-full" style={{ width: `${(count as number / products.length) * 100}%` }} />
+                    <div className="h-full bg-primary rounded-full" style={{ width: `${((count as number) / products.length) * 100}%` }} />
                   </div>
                   <span className="text-xs font-semibold text-foreground w-6 text-right">{count as number}</span>
                 </div>
