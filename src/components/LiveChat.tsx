@@ -48,7 +48,7 @@ const LiveChat = () => {
       }
 
       const reader = resp.body?.getReader();
-      if (!reader) throw new Error("No stream");
+      if (!reader) throw new Error("No stream stream found");
       const decoder = new TextDecoder();
       let textBuffer = "";
 

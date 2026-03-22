@@ -50,7 +50,7 @@ const ShippingPage = () => (
         <div className="bg-card border border-border rounded-lg p-6">
           <h2 className="font-semibold text-foreground mb-3 flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" /> Store Pickup</h2>
           <p className="text-sm text-muted-foreground">Free pickup available at our Olkalou store. Select "Store Pickup" at checkout.</p>
-          <p className="text-sm text-muted-foreground mt-2"><strong>Hours:</strong> Monday – Saturday, 8:00 AM – 6:00 PM</p>
+          <p className="text-sm text-muted-foreground mt-2"><strong>Hours:</strong> Monday – Saturday, 8:00 AM – 7:00 PM</p>
         </div>
       </div>
     </div>
