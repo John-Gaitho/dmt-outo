@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { StoreProvider } from "@/context/StoreContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import Index from "./pages/Index.tsx";
 import ShopPage from "./pages/ShopPage.tsx";
 import CartPage from "./pages/CartPage.tsx";
@@ -27,35 +28,37 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <StoreProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <WhatsAppButton />
-            <LiveChat />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/shop" element={<ShopPage />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/product/:id" element={<ProductDetailPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/faq" element={<FAQPage />} />
-              <Route path="/wishlist" element={<WishlistPage />} />
-              <Route path="/returns" element={<ReturnsPage />} />
-              <Route path="/shipping" element={<ShippingPage />} />
-              <Route path="/warranty" element={<WarrantyPage />} />
-              <Route path="/blog" element={<BlogPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </StoreProvider>
-      </AuthProvider>
-    </TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <AuthProvider>
+          <StoreProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <WhatsAppButton />
+              <LiveChat />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/shop" element={<ShopPage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/product/:id" element={<ProductDetailPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/faq" element={<FAQPage />} />
+                <Route path="/wishlist" element={<WishlistPage />} />
+                <Route path="/returns" element={<ReturnsPage />} />
+                <Route path="/shipping" element={<ShippingPage />} />
+                <Route path="/warranty" element={<WarrantyPage />} />
+                <Route path="/blog" element={<BlogPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </StoreProvider>
+        </AuthProvider>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

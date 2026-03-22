@@ -1,7 +1,8 @@
-import { Search, HelpCircle, Heart, ShoppingCart, User, ChevronDown, Menu, X, LogOut } from "lucide-react";
+import { Search, HelpCircle, Heart, ShoppingCart, User, ChevronDown, Menu, X, LogOut, Sun, Moon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "@/context/StoreContext";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
 
@@ -108,6 +109,7 @@ const HeaderMain = () => {
 
 const Navigation = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const navLinks = [
     { label: "Home", to: "/" },
     { label: "Shop", to: "/shop" },
@@ -133,6 +135,9 @@ const Navigation = () => {
           ))}
         </div>
         <div className="hidden md:flex items-center gap-3 text-sm text-muted-foreground">
+          <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-muted transition-colors" aria-label="Toggle theme">
+            {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+          </button>
           <span>KSH</span>
           <span>English</span>
         </div>
