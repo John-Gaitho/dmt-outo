@@ -26,6 +26,7 @@ export interface Product {
   deal?: boolean;
   discount?: number;
   description?: string;
+  stockQuantity?: number;
 }
 
 export interface CartItem {

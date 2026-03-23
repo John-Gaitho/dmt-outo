@@ -43,6 +43,7 @@ const mapDbProduct = (row: any): Product => ({
   deal: row.deal,
   discount: row.discount || undefined,
   description: row.description || undefined,
+  stockQuantity: row.stock_quantity ?? 100,
 });
 
 export const StoreProvider = ({ children }: { children: ReactNode }) => {
