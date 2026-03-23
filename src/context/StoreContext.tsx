@@ -43,6 +43,7 @@ const mapDbProduct = (row: any): Product => ({
   deal: row.deal,
   discount: row.discount || undefined,
   description: row.description || undefined,
+  stockQuantity: row.stock_quantity ?? 100,
 });
 
 export const StoreProvider = ({ children }: { children: ReactNode }) => {
@@ -126,6 +127,7 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
       deal: product.deal || false,
       discount: product.discount || null,
       description: product.description || null,
+      stock_quantity: product.stockQuantity ?? 100,
     });
     if (!error) await fetchProducts();
   };
@@ -145,6 +147,7 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
       deal: product.deal || false,
       discount: product.discount || null,
       description: product.description || null,
+      stock_quantity: product.stockQuantity ?? 100,
     }).eq("id", product.id);
     if (!error) await fetchProducts();
   };

@@ -30,6 +30,7 @@ export type Database = {
           price: number
           rating: number
           reviews: number
+          stock_quantity: number
           subcategory: string | null
           updated_at: string
         }
@@ -48,6 +49,7 @@ export type Database = {
           price?: number
           rating?: number
           reviews?: number
+          stock_quantity?: number
           subcategory?: string | null
           updated_at?: string
         }
@@ -66,6 +68,7 @@ export type Database = {
           price?: number
           rating?: number
           reviews?: number
+          stock_quantity?: number
           subcategory?: string | null
           updated_at?: string
         }
