@@ -147,6 +147,7 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
       deal: product.deal || false,
       discount: product.discount || null,
       description: product.description || null,
+      stock_quantity: product.stockQuantity ?? 100,
     }).eq("id", product.id);
     if (!error) await fetchProducts();
   };
