@@ -24,6 +24,7 @@ import NotFound from "./pages/NotFound.tsx";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import LiveChat from "@/components/LiveChat";
 import CategoryPage from "@/pages/CategoryPage";
+import ScrollToTop from "@/components/ScrollToTop";
 
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
             <BrowserRouter>
               <WhatsAppButton />
               <LiveChat />
+              <ScrollToTop />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/shop" element={<ShopPage />} />
