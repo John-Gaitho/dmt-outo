@@ -1,24 +1,50 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const WhatsAppButton = () => {
   const [showTooltip, setShowTooltip] = useState(false);
+  const [visible, setVisible] = useState(true);
 
-  const phoneNumber = "254718634116"; // your number
+  const phoneNumber = "254718634116";
   const message = "Hello, I'm interested in your auto parts.";
-
   const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // scrolling down → hide
+        setVisible(false);
+      } else {
+        // scrolling up → show
+        setVisible(true);
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <div
-      className="fixed right-4 z-50 flex flex-col items-end"
-      style={{
-        bottom: "calc(1rem + env(safe-area-inset-bottom))",
-      }}
+      className={`
+        fixed right-20 z-50 flex flex-col items-end
+        bottom-20 md:bottom-8
+        transition-all duration-300
+        ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"}
+      `}
     >
       {/* Tooltip */}
       <div
         className={`mb-2 px-3 py-1 text-sm bg-black text-white rounded-lg shadow transition-all duration-300 ${
-          showTooltip ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+          showTooltip
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-2"
         }`}
       >
         Chat with us
@@ -32,7 +58,11 @@ const WhatsAppButton = () => {
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         onClick={() => setShowTooltip(false)}
-        className="fixed bottom-20 md:bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-3.5 rounded-full shadow-lg hover:scale-110 transition-transform"
+        className="
+          bg-green-500 hover:bg-green-600 text-white
+          p-3.5 rounded-full shadow-lg
+          hover:scale-110 transition-transform
+        "
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
