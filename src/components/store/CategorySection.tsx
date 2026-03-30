@@ -20,37 +20,62 @@ const categoryImages = [
 ];
 
 const CategorySection = () => (
-  <section className="py-10">
+  <section className="py-10 overflow-hidden">
     <div className="container">
-      <h2 className="text-xl font-bold text-foreground mb-6 text-center">Shop By Category</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-        {categoryImages.map((cat, i) => (
-          <Link
-            key={cat.name}
-            to={`/shop?category=${encodeURIComponent(cat.name)}`}
-            className="group flex flex-col items-center gap-3 cursor-pointer"
-          >
-            <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full bg-muted border-2 border-border overflow-hidden group-hover:border-primary group-hover:shadow-lg transition-all duration-300">
-              <img
-                src={cat.image}
-                alt={cat.name}
-                className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-500"
-                style={{ animation: `float ${3 + i * 0.3}s ease-in-out infinite` }}
-              />
-            </div>
-            <p className="text-xs font-semibold text-foreground text-center leading-tight group-hover:text-primary transition-colors">
-              {cat.name}
-            </p>
-          </Link>
-        ))}
+      <h2 className="text-xl font-bold text-foreground mb-6 text-center">
+        Shop By Category
+      </h2>
+
+      <div className="slider">
+        <div className="slide-track">
+
+          {[...categoryImages, ...categoryImages].map((cat, i) => (
+            <Link
+              key={i}
+              to={`/shop?category=${encodeURIComponent(cat.name)}`}
+              className="group flex flex-col items-center gap-3 min-w-[120px]"
+            >
+              <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full bg-muted border-2 border-border overflow-hidden group-hover:border-primary group-hover:shadow-lg transition-all duration-300">
+                <img
+                  src={cat.image}
+                  alt={cat.name}
+                  className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-500"
+                />
+              </div>
+
+              <p className="text-xs font-semibold text-foreground text-center leading-tight group-hover:text-primary transition-colors">
+                {cat.name}
+              </p>
+            </Link>
+          ))}
+
+        </div>
       </div>
     </div>
-    <style>{`
-      @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-6px); }
-      }
-    `}</style>
+
+<style>{`
+.slider {
+  overflow: hidden;
+  width: 100%;
+}
+
+.slide-track {
+  display: flex;
+  width: calc(200px * 16);
+  animation: scroll 25s linear infinite;
+  gap: 1.5rem;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+`}</style>
+
   </section>
 );
 

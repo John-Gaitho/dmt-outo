@@ -135,3 +135,46 @@
     background-color: hsl(var(--warning));
   }
 }
+/* ================= Ken Burns Animations ================= */
+
+@keyframes kenburnsLeft {
+  0% {
+    transform: scale(1.1) translate(0, 0);
+  }
+
+  100% {
+    transform: scale(1.2) translate(-30px, -15px);
+  }
+}
+
+@keyframes kenburnsRight {
+  0% {
+    transform: scale(1.1) translate(0, 0);
+  }
+
+  100% {
+    transform: scale(1.2) translate(30px, -15px);
+  }
+}
+
+@keyframes kenburnsUp {
+  0% {
+    transform: scale(1.1) translate(0, 0);
+  }
+
+  100% {
+    transform: scale(1.2) translate(0, -25px);
+  }
+}
+
+.kenburns-0 {
+  animation: kenburnsLeft 6s ease-in-out forwards;
+}
+
+.kenburns-1 {
+  animation: kenburnsRight 6s ease-in-out forwards;
+}
+
+.kenburns-2 {
+  animation: kenburnsUp 6s ease-in-out forwards;
+}

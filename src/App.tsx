@@ -23,6 +23,8 @@ import ContactPage from "./pages/ContactPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import LiveChat from "@/components/LiveChat";
+import CategoryPage from "@/pages/CategoryPage";
+
 
 const queryClient = new QueryClient();
 
@@ -52,6 +54,8 @@ const App = () => (
                 <Route path="/blog" element={<BlogPage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/category/:category/:subcategory" element={<CategoryPage />} />
+                <Route path="/category/:category" element={<CategoryPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
