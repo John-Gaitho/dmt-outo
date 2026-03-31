@@ -196,9 +196,7 @@ const HeroSection = () => {
               High quality spare parts for every vehicle — fast delivery & best prices.
             </p>
 
-            <button className="bg-primary hover:bg-primary/90 text-white px-7 py-3 rounded-lg font-semibold shadow-lg transition hover:scale-105">
-              Shop Now →
-            </button>
+            
 
           </div>
         </div>
