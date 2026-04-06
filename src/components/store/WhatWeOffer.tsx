@@ -5,6 +5,7 @@ import { useStore } from "@/context/StoreContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ProductCard from "./ProductCard";
 import { categories } from "@/data/store";
+import { useMemo } from "react";
 
 type Tab = "new" | "featured" | "popular";
 
@@ -34,7 +35,12 @@ const WhatWeOffer = () => {
     }
   })();
 
-  const displayProducts = filteredProducts.slice(0, 6);
+  
+
+const displayProducts = useMemo(() => {
+  const shuffled = [...filteredProducts].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 6);
+}, [activeTab, products]);
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "new", label: "NEW ARRIVALS" },
