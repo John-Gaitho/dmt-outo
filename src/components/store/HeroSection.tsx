@@ -1,213 +1,160 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  carMakes,
-  carModels,
-  carYears,
-  carClasses,
-} from "@/data/store";
-
+import { Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import heroBundle from "@/assets/hero-bundle.jpg";
 import hero1 from "@/assets/hero1.jpg";
 import hero2 from "@/assets/hero2.jpg";
-import hero3 from "@/assets/hero3.jpg";
+import promoTires from "@/assets/promo-tires.jpg";
+import promoAudio from "@/assets/promo-audio.jpg";
 
-const images = [hero1, hero2, hero3];
-
-const typingTexts = [
-  "DMT Genuine Car Parts",
-  "Upgrade Your Ride Today",
-  "Premium Auto Solutions",
+const slides = [
+  {
+    image: heroBundle,
+    subtitle: "BUY FROM US & GET YOUR",
+    title: "EXCITING\nBUNDLE",
+    description: "This is our most comprehensive vehicle treatment.",
+  },
+  {
+    image: hero1,
+    subtitle: "PREMIUM AUTO PARTS",
+    title: "QUALITY\nPARTS",
+    description: "High quality spare parts for every vehicle.",
+  },
+  {
+    image: hero2,
+    subtitle: "BEST PRICES GUARANTEED",
+    title: "GREAT\nDEALS",
+    description: "Fast delivery & best prices across Kenya.",
+  },
 ];
 
-/* ================= VEHICLE SELECTOR ================= */
-
-const VehicleSelector = () => {
-  const navigate = useNavigate();
-
-  const [make, setMake] = useState("");
-  const [model, setModel] = useState("");
-  const [year, setYear] = useState("");
-  const [vehicleClass, setVehicleClass] = useState("");
-
-  const selectClass =
-    "bg-white/90 backdrop-blur border border-gray-200 rounded-md px-3 py-2 text-sm flex-1 min-w-[140px] focus:outline-none focus:ring-2 focus:ring-primary";
-
-  const handleSearch = () => {
-    const params = new URLSearchParams();
-
-    if (make) params.set("make", make);
-    if (model) params.set("model", model);
-    if (year) params.set("year", year);
-    if (vehicleClass) params.set("class", vehicleClass);
-
-    navigate(`/shop?${params.toString()}`);
-  };
-
-  return (
-    <div className="bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-4 flex flex-wrap items-center gap-3">
-      <div className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-        Select Your Vehicle
-      </div>
-
-      {/* Make */}
-      <select
-        value={make}
-        onChange={(e) => {
-          setMake(e.target.value);
-          setModel("");
-        }}
-        className={selectClass}
-      >
-        <option value="">Make</option>
-        {carMakes.map((m) => (
-          <option key={m}>{m}</option>
-        ))}
-      </select>
-
-      {/* Model */}
-      <select
-        value={model}
-        onChange={(e) => setModel(e.target.value)}
-        className={selectClass}
-      >
-        <option value="">Model</option>
-        {make &&
-          carModels[make]?.map((m) => (
-            <option key={m}>{m}</option>
-          ))}
-      </select>
-
-      {/* Year */}
-      <select
-        value={year}
-        onChange={(e) => setYear(e.target.value)}
-        className={selectClass}
-      >
-        <option value="">Year</option>
-        {carYears.map((y) => (
-          <option key={y}>{y}</option>
-        ))}
-      </select>
-
-      {/* Class */}
-      <select
-        value={vehicleClass}
-        onChange={(e) => setVehicleClass(e.target.value)}
-        className={selectClass}
-      >
-        <option value="">Class</option>
-        {carClasses.map((c) => (
-          <option key={c}>{c}</option>
-        ))}
-      </select>
-
-      {/* Search Button */}
-      <button
-        onClick={handleSearch}
-        className="bg-primary text-white px-6 py-2.5 rounded-md text-sm font-semibold hover:scale-105 transition-transform shadow"
-      >
-        Search →
-      </button>
-    </div>
-  );
-};
-
-/* ================= HERO SECTION ================= */
-
 const HeroSection = () => {
-  const [currentImage, setCurrentImage] = useState(0);
-  const [textIndex, setTextIndex] = useState(0);
-  const [displayedText, setDisplayedText] = useState("");
-  const [charIndex, setCharIndex] = useState(0);
+  const [current, setCurrent] = useState(0);
 
-  /* Image Slider */
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % images.length);
-    }, 6000); // Match animation timing
-
-    return () => clearInterval(interval);
+    const timer = setInterval(() => setCurrent((p) => (p + 1) % slides.length), 5000);
+    return () => clearInterval(timer);
   }, []);
 
-  /* Typing Animation */
-  useEffect(() => {
-    const currentText = typingTexts[textIndex];
-
-    if (charIndex < currentText.length) {
-      const timeout = setTimeout(() => {
-        setDisplayedText(
-          (prev) => prev + currentText[charIndex]
-        );
-        setCharIndex((prev) => prev + 1);
-      }, 60);
-
-      return () => clearTimeout(timeout);
-    } else {
-      const timeout = setTimeout(() => {
-        setDisplayedText("");
-        setCharIndex(0);
-        setTextIndex(
-          (prev) => (prev + 1) % typingTexts.length
-        );
-      }, 2000);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [charIndex, textIndex]);
+  const slide = slides[current];
 
   return (
-    <section className="relative">
+    <section className="py-4">
+      <div className="container">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Main carousel */}
+          <div className="lg:col-span-2 relative rounded-lg overflow-hidden h-[300px] md:h-[400px]">
+            {slides.map((s, i) => (
+              <img
+                key={i}
+                src={s.image}
+                alt={s.title}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                  i === current ? "opacity-100" : "opacity-0"
+                }`}
+                width={1200}
+                height={600}
+              />
+            ))}
 
-      {/* HERO IMAGE CONTAINER */}
-      <div className="relative h-[500px] md:h-[600px] lg:h-[650px] xl:h-[700px] overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
 
-        {/* Images */}
-        {images.map((img, index) => (
-          <img
-            key={index}
-            src={img}
-            alt="Hero Background"
-            className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000
-            ${
-              index === currentImage
-                ? `opacity-100 kenburns-${index}`
-                : "opacity-0"
-            }`}
-          />
-        ))}
+            <div className="absolute inset-0 flex items-center px-8 md:px-12">
+              <div className="text-white max-w-md">
+                <p className="text-xs md:text-sm font-medium text-primary mb-2">{slide.subtitle}</p>
+                <h2 className="text-3xl md:text-5xl font-extrabold leading-tight mb-3 whitespace-pre-line">
+                  {slide.title}
+                </h2>
+                <p className="text-sm text-gray-300 mb-5">{slide.description}</p>
+                <Link
+                  to="/shop"
+                  className="inline-block bg-primary text-primary-foreground px-6 py-2.5 rounded text-sm font-bold hover:opacity-90 transition-opacity"
+                >
+                  SHOP NOW
+                </Link>
+              </div>
+            </div>
 
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/80" />
+            {/* Dots */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrent(i)}
+                  className={`w-3 h-3 rounded-full transition-colors ${
+                    i === current ? "bg-primary" : "bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
 
-        {/* Hero Content */}
-        <div className="absolute inset-0 flex items-center">
-          <div className="container text-white max-w-3xl">
+            {/* Arrows */}
+            <button
+              onClick={() => setCurrent((p) => (p - 1 + slides.length) % slides.length)}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setCurrent((p) => (p + 1) % slides.length)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full transition-colors"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
 
-            <p className="uppercase text-yellow-400 font-semibold tracking-wider mb-3">
-              Premium Auto Parts
-            </p>
+          {/* Side promo banners */}
+          <div className="flex flex-row lg:flex-col gap-4">
+            {/* Tires promo */}
+            <div className="relative flex-1 rounded-lg overflow-hidden group cursor-pointer min-h-[140px]">
+              <img
+                src={promoTires}
+                alt="New Tires"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+                width={640}
+                height={512}
+              />
+              <div className="absolute inset-0 bg-black/40" />
+              <div className="absolute inset-0 flex flex-col justify-center px-5">
+                <p className="text-xs text-primary font-semibold">NEW RIMS</p>
+                <h3 className="text-xl md:text-2xl font-extrabold text-white leading-tight">NEW TIRES</h3>
+                <p className="text-xs text-gray-300 mt-1">Wearing the best!</p>
+                <Link
+                  to="/shop?category=Exterior+%26+Accessories"
+                  className="mt-3 inline-block border border-primary text-primary text-xs font-semibold px-4 py-1.5 rounded hover:bg-primary hover:text-primary-foreground transition-colors w-fit"
+                >
+                  View Details
+                </Link>
+              </div>
+            </div>
 
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
-              {displayedText}
-              <span className="animate-pulse">|</span>
-            </h1>
-
-            <p className="text-lg md:text-xl text-gray-200 mb-6">
-              High quality spare parts for every vehicle — fast delivery & best prices.
-            </p>
-
-            
-
+            {/* Audio promo */}
+            <div className="relative flex-1 rounded-lg overflow-hidden group cursor-pointer min-h-[140px]">
+              <img
+                src={promoAudio}
+                alt="HiFi Audio"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+                width={640}
+                height={512}
+              />
+              <div className="absolute inset-0 bg-black/40" />
+              <div className="absolute inset-0 flex flex-col justify-center px-5">
+                <p className="text-xs text-primary font-semibold">GET YOURS</p>
+                <h3 className="text-xl md:text-2xl font-extrabold text-white leading-tight">HIFI AUDIO</h3>
+                <p className="text-xs text-gray-300 mt-1">Listening to the best</p>
+                <Link
+                  to="/shop?category=Electrical"
+                  className="mt-3 inline-block border border-primary text-primary text-xs font-semibold px-4 py-1.5 rounded hover:bg-primary hover:text-primary-foreground transition-colors w-fit"
+                >
+                  View Details
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
-
       </div>
-
-      {/* Vehicle Selector */}
-      <div className="container -mt-12 relative z-10">
-        <VehicleSelector />
-      </div>
-
     </section>
   );
 };
