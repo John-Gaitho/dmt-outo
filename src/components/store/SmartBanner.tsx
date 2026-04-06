@@ -73,7 +73,9 @@ const SmartBanner = ({
     return null;
 
   const banner =
-    filteredBanners[currentIndex];
+    filteredBanners[currentIndex % filteredBanners.length];
+
+  if (!banner) return null;
 
   return (
 

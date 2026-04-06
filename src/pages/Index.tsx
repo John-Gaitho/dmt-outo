@@ -1,5 +1,6 @@
 import StoreHeader from "@/components/store/StoreHeader";
 import HeroSection from "@/components/store/HeroSection";
+import FloatingProducts from "@/components/store/FloatingProducts";
 import WhatWeOffer from "@/components/store/WhatWeOffer";
 import PremiumBanner from "@/components/store/PremiumBanner";
 import DealsSection from "@/components/store/DealsSection";
@@ -11,6 +12,7 @@ const Index = () => (
   <div className="min-h-screen bg-background pb-16 md:pb-0">
     <StoreHeader />
     <HeroSection />
+    <FloatingProducts />
     <WhatWeOffer />
     <PremiumBanner />
     <DealsSection />
