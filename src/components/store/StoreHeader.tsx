@@ -43,53 +43,73 @@ const StoreHeader = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-[hsl(215,25%,12%)]/95 border-b border-white/5">
+    <header className=" sticky top-0 z-50 
+bg-green-600 
+md:bg-gradient-to-r md:from-green-600 md:to-white 
+shadow-lg text-white backdrop-blur-md">
 
       {/* ───────── MOBILE ───────── */}
       <div className="flex items-center justify-between px-4 py-3 md:hidden">
+
         <div className="flex items-center gap-3">
           <button onClick={() => setMenuOpen(true)}>
             <Menu className="w-6 h-6 text-white" />
           </button>
+
           <Link to="/">
-            <img src={logo} className="h-9" />
+            <img src={logo} className="h-11" />
           </Link>
         </div>
 
-        <div className="flex items-center gap-4 text-white">
+        <div className="flex items-center gap-4">
+
           <button onClick={() => setSearchOpen(!searchOpen)}>
-            <Search className="w-5 h-5" />
+            <Search className="w-5 h-5 text-white" />
           </button>
 
           <Link to="/wishlist" className="relative">
-            <Heart className="w-5 h-5" />
+            <Heart className="w-5 h-5 text-white" />
             {wishlist.length > 0 && (
-              <span className="badge">{wishlist.length}</span>
+              <span className="badge">
+                {wishlist.length}
+              </span>
             )}
           </Link>
 
           <Link to="/cart" className="relative">
-            <ShoppingCart className="w-5 h-5" />
+            <ShoppingCart className="w-5 h-5 text-white" />
             {cartCount > 0 && (
-              <span className="badge">{cartCount}</span>
+              <span className="badge">
+                {cartCount}
+              </span>
             )}
           </Link>
+
         </div>
       </div>
 
+      {/* MOBILE SEARCH */}
       {searchOpen && (
         <div className="md:hidden px-4 pb-3">
-          <div className="flex shadow-lg rounded-md overflow-hidden">
+          <div className="flex rounded-full overflow-hidden border shadow-sm bg-white">
+
             <input
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              onKeyDown={(e) =>
+                e.key === "Enter" && handleSearch()
+              }
               placeholder="Search products..."
-              className="flex-1 px-4 py-2 text-sm"
+              className="flex-1 px-4 py-2 text-sm outline-none text-gray-700"
             />
-            <button onClick={handleSearch} className="bg-primary px-4">
+
+            <button
+              onClick={handleSearch}
+              className="bg-orange-500 hover:bg-orange-600 px-4 text-white font-semibold transition"
+            >
               GO
             </button>
+
           </div>
         </div>
       )}
@@ -98,138 +118,244 @@ const StoreHeader = () => {
       <div className="hidden md:block">
 
         {/* TOP BAR */}
-        <div className="bg-black/40 text-xs text-gray-300">
+        <div className="bg-orange-500 text-xs text-white">
+
           <div className="container flex justify-between py-2">
+
             <div className="flex gap-5">
-              <Link to="/auth" className="hover:text-white">My Account</Link>
-              <Link to="/wishlist" className="hover:text-white">Wishlist</Link>
-              {isAdmin && <Link to="/admin" className="text-primary">Admin</Link>}
+
+              <Link
+                to="/auth"
+                className="hover:text-yellow-300 transition"
+              >
+                My Account
+              </Link>
+
+              <Link
+                to="/wishlist"
+                className="hover:text-yellow-300 transition"
+              >
+                Wishlist
+              </Link>
+
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="font-semibold text-yellow-300"
+                >
+                  Admin
+                </Link>
+              )}
+
             </div>
 
             <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-white">
-                  +254 712 345 678
+
+              <div className="flex items-center gap-1">
+                <Phone className="w-4 h-4" />
+                <span className="font-medium">
+                  0725798506
                 </span>
               </div>
 
               {user ? (
-                <button onClick={signOut} className="hover:text-white flex gap-1">
-                  <LogOut className="w-3 h-3" /> Logout
+                <button
+                  onClick={signOut}
+                  className="flex items-center gap-1 hover:text-yellow-300 transition"
+                >
+                  <LogOut className="w-3 h-3" />
+                  Logout
                 </button>
               ) : (
-                <Link to="/auth">Sign In</Link>
+                <Link to="/auth">
+                  Sign In
+                </Link>
               )}
+
             </div>
+
           </div>
+
         </div>
 
         {/* MAIN HEADER */}
-        <div className="container flex items-center gap-8 py-4">
+        <div className="container flex items-center gap-8 py-3 bg-white text-gray-800">
 
           {/* LOGO */}
           <Link to="/" className="shrink-0">
-            <img src={logo} className="h-12" />
+            <img src={logo} className="h-14" />
           </Link>
 
           {/* SEARCH */}
-          <div className="flex-1 flex max-w-2xl">
-            <div className="flex w-full shadow-lg rounded-md overflow-hidden focus-within:ring-2 ring-primary transition">
+          <div className="flex-1 max-w-xl">
+
+            <div className="flex items-center rounded-full border px-4 py-2 shadow-sm focus-within:ring-2 ring-blue-500 transition">
+
+              <Search className="w-4 h-4 text-gray-400 mr-2" />
+
               <input
                 value={localSearch}
-                onChange={(e) => setLocalSearch(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                onChange={(e) =>
+                  setLocalSearch(e.target.value)
+                }
+                onKeyDown={(e) =>
+                  e.key === "Enter" &&
+                  handleSearch()
+                }
                 placeholder="Search products..."
-                className="flex-1 px-4 py-3 text-sm outline-none"
+                className="flex-1 bg-transparent text-sm outline-none"
               />
+
               <button
                 onClick={handleSearch}
-                className="bg-primary px-6 text-sm font-bold hover:opacity-90"
+                className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-1.5 rounded-full text-xs font-bold transition"
               >
-                SEARCH
+                Search
               </button>
+
             </div>
+
           </div>
 
           {/* ACTIONS */}
           <div className="flex items-center gap-6">
 
-            <Link to="/wishlist" className="relative hover:scale-110 transition">
-              <Heart className="w-6 h-6 text-white" />
-              {wishlist.length > 0 && <span className="badge">{wishlist.length}</span>}
+            <Link
+              to="/wishlist"
+              className="relative"
+            >
+
+              <Heart className="w-6 h-6 text-gray-700 hover:text-orange-500 transition" />
+
+              {wishlist.length > 0 && (
+                <span className="badge">
+                  {wishlist.length}
+                </span>
+              )}
+
             </Link>
 
-            <Link to="/cart" className="flex items-center gap-2 hover:scale-105 transition">
+            <Link
+              to="/cart"
+              className="flex items-center gap-2"
+            >
+
               <div className="relative">
-                <ShoppingCart className="w-6 h-6 text-white" />
-                {cartCount > 0 && <span className="badge">{cartCount}</span>}
+
+                <ShoppingCart className="w-6 h-6 text-gray-700 hover:text-orange-500 transition" />
+
+                {cartCount > 0 && (
+                  <span className="badge">
+                    {cartCount}
+                  </span>
+                )}
+
               </div>
-              <span className="text-sm font-semibold text-white">
+
+              <span className="text-sm font-bold text-orange-500">
+
                 KSh {cartTotal.toLocaleString()}
+
               </span>
+
             </Link>
 
-            <button onClick={toggleTheme}>
-              {theme === "light" ? <Moon /> : <Sun />}
+            {/* THEME BUTTON */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full border hover:bg-gray-100 transition"
+            >
+
+              {theme === "light"
+                ? <Moon />
+                : <Sun />}
+
             </button>
 
           </div>
+
         </div>
 
-        {/* NAV */}
-        <nav className="border-t border-white/5">
-          <div className="container flex gap-2">
+        {/* NAVIGATION */}
+        <nav className="border-t bg-white">
+
+          <div className="container flex gap-6">
+
             {navLinks.map((link, i) => (
+
               <Link
                 key={i}
                 to={link.to}
-                className="px-5 py-3 text-sm font-semibold text-white hover:text-primary relative group"
+                className="py-3 text-sm font-medium text-gray-700 hover:text-orange-500 relative group"
               >
-                {link.label}
-                {link.hasDropdown && <ChevronDown className="inline w-3 h-3 ml-1" />}
 
-                {/* underline animation */}
-                <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-primary group-hover:w-full transition-all"></span>
+                {link.label}
+
+                {link.hasDropdown && (
+                  <ChevronDown className="inline w-3 h-3 ml-1" />
+                )}
+
+                <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-orange-500 group-hover:w-full transition-all" />
+
               </Link>
+
             ))}
+
           </div>
+
         </nav>
 
       </div>
 
-      {/* ───────── MOBILE MENU ───────── */}
+      {/* MOBILE MENU */}
       {menuOpen && (
-        <div className="fixed inset-0 bg-black/95 z-50 flex flex-col">
-          <div className="flex justify-between p-4 text-white">
-            <span>Menu</span>
-            <button onClick={() => setMenuOpen(false)}><X /></button>
+
+        <div className="fixed inset-0 bg-white z-50 flex flex-col">
+
+          <div className="flex justify-between p-4">
+
+            <span className="font-bold text-lg">
+              Menu
+            </span>
+
+            <button
+              onClick={() => setMenuOpen(false)}
+            >
+              <X />
+            </button>
+
           </div>
 
-          <div className="flex flex-col gap-5 px-6 text-lg text-white">
+          <div className="flex flex-col gap-5 px-6 text-lg">
+
             {navLinks.map((l) => (
-              <Link key={l.label} to={l.to} onClick={() => setMenuOpen(false)}>
+
+              <Link
+                key={l.label}
+                to={l.to}
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
                 {l.label}
               </Link>
+
             ))}
+
           </div>
 
-          <div className="mt-auto p-6 flex flex-col gap-4 text-white">
-            <a href="tel:+254712345678" className="flex gap-2"><Phone /> Call</a>
-            <button onClick={toggleTheme} className="flex gap-2">
-              {theme === "light" ? <Moon /> : <Sun />} Theme
-            </button>
-          </div>
         </div>
+
       )}
 
-      {/* 🔥 SHARED STYLES */}
+      {/* BADGE STYLE */}
       <style>{`
+
         .badge {
           position: absolute;
           top: -6px;
           right: -6px;
-          background: hsl(var(--primary));
+          background: #ef4444;
           color: white;
           font-size: 10px;
           width: 16px;
@@ -238,8 +364,11 @@ const StoreHeader = () => {
           display: flex;
           align-items: center;
           justify-content: center;
+          font-weight: bold;
         }
+
       `}</style>
+
     </header>
   );
 };

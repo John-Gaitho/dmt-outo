@@ -132,8 +132,8 @@ const StoreFooter = () => (
 
             <p className="flex items-center gap-3">
               <Phone className="w-4 h-4 text-primary"/>
-              <a href="tel:+254712345678" className="hover:text-white transition">
-                +254 712 345 678
+              <a href="tel:+254725798506" className="hover:text-white transition">
+                0725798506
               </a>
             </p>
 

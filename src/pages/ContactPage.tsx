@@ -23,7 +23,7 @@ const ContactPage = () => {
           <div className="space-y-4">
             <div className="bg-card border border-border rounded-lg p-6 space-y-3 text-sm text-muted-foreground">
               <p className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> Olkalou Town, Nyandarua County</p>
-              <p className="flex items-center gap-2"><Phone className="w-4 h-4 text-primary" /> +254 712 345 678</p>
+              <p className="flex items-center gap-2"><Phone className="w-4 h-4 text-primary" /> 0725798506</p>
               <p className="flex items-center gap-2"><Mail className="w-4 h-4 text-primary" /> info@dmtspares.co.ke</p>
             </div>
             <div className="rounded-lg overflow-hidden border border-border">

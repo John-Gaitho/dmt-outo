@@ -157,15 +157,15 @@ const ProductDetailPage = () => {
             <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
               <div className="flex flex-col items-center text-center gap-1">
                 <Truck className="w-5 h-5 text-primary" />
-                <span className="text-[10px] text-muted-foreground">Free Shipping</span>
+                <span className="text-[10px] text-muted-foreground">Free derivery within olkalou</span>
               </div>
               <div className="flex flex-col items-center text-center gap-1">
                 <Shield className="w-5 h-5 text-primary" />
-                <span className="text-[10px] text-muted-foreground">2 Year Warranty</span>
+                <span className="text-[10px] text-muted-foreground">1 month Warranty</span>
               </div>
               <div className="flex flex-col items-center text-center gap-1">
                 <RotateCcw className="w-5 h-5 text-primary" />
-                <span className="text-[10px] text-muted-foreground">30 Day Returns</span>
+                <span className="text-[10px] text-muted-foreground">5 Day Returns</span>
               </div>
             </div>
           </div>
