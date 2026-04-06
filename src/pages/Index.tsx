@@ -1,7 +1,7 @@
 import StoreHeader from "@/components/store/StoreHeader";
 import HeroSection from "@/components/store/HeroSection";
-import CategorySection from "@/components/store/CategorySection";
-import PromoBanners from "@/components/store/PromoBanners";
+import WhatWeOffer from "@/components/store/WhatWeOffer";
+import PremiumBanner from "@/components/store/PremiumBanner";
 import DealsSection from "@/components/store/DealsSection";
 import ProductSection from "@/components/store/ProductSection";
 import StoreFooter from "@/components/store/StoreFooter";
@@ -11,8 +11,8 @@ const Index = () => (
   <div className="min-h-screen bg-background pb-16 md:pb-0">
     <StoreHeader />
     <HeroSection />
-    <CategorySection />
-    <PromoBanners />
+    <WhatWeOffer />
+    <PremiumBanner />
     <DealsSection />
 
     <ProductSection
@@ -48,41 +48,6 @@ const Index = () => (
         { name: "Gaskets", link: "/category/engine/gaskets" },
         { name: "Pistons", link: "/category/engine/pistons" },
         { name: "Timing Belts", link: "/category/engine/timing-belts" },
-      ]}
-    />
-
-    <ProductSection
-      title="Electrical"
-      category="Electrical"
-      subcategories={[
-        { name: "Batteries", link: "/category/electrical/batteries" },
-        { name: "Alternators", link: "/category/electrical/alternators" },
-        { name: "Starters", link: "/category/electrical/starters" },
-        { name: "Wiring", link: "/category/electrical/wiring" },
-        { name: "Fuses", link: "/category/electrical/fuses" },
-      ]}
-    />
-
-    <ProductSection
-      title="Air & Fuel Delivery"
-      category="Air & Fuel Delivery"
-      subcategories={[
-        { name: "Air Filters", link: "/category/air-fuel/air-filters" },
-        { name: "Fuel Pumps", link: "/category/air-fuel/fuel-pumps" },
-        { name: "Carburetors", link: "/category/air-fuel/carburetors" },
-        { name: "Injectors", link: "/category/air-fuel/injectors" },
-      ]}
-    />
-
-    <ProductSection
-      title="Exterior & Accessories"
-      category="Exterior & Accessories"
-      subcategories={[
-        { name: "Mirrors", link: "/category/exterior/mirrors" },
-        { name: "Bumpers", link: "/category/exterior/bumpers" },
-        { name: "Fenders", link: "/category/exterior/fenders" },
-        { name: "Grilles", link: "/category/exterior/grilles" },
-        { name: "Wipers", link: "/category/exterior/wipers" },
       ]}
     />
 
