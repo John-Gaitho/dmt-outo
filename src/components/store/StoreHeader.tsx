@@ -1,4 +1,4 @@
-import { Search, Heart, ShoppingCart, Menu, X, LogOut, Sun, Moon, Phone, ChevronDown } from "lucide-react";
+import { Heart, ShoppingCart, Menu, X, LogOut, Sun, Moon, Phone, ChevronDown, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "@/context/StoreContext";
 import { useAuth } from "@/context/AuthContext";
