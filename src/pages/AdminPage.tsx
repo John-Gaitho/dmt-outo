@@ -585,7 +585,7 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
               const qty = p.stockQuantity ?? 0;
               const isLow = qty <= 10 && p.inStock;
               return (
-                <tr key={p.id} className={`border-b border-border/50 hover:bg-muted/50 ${isLow ? "bg-warning/5" : ""}`}>
+                <tr key={p.id} onClick={() => { onEdit(p); startEdit(p); }} className={`border-b border-border/50 hover:bg-muted/50 cursor-pointer ${isLow ? "bg-warning/5" : ""}`}>
                   <td className="p-2.5 flex items-center gap-2">
                     <img src={p.images?.[0] || p.image} alt={p.name} className="w-8 h-8 object-contain rounded bg-muted p-0.5" />
                     <div className="min-w-0">
