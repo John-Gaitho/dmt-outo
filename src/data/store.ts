@@ -54,14 +54,14 @@ export interface Category {
 /* ================= STATIC CATEGORIES ================= */
 
 export const categories: Category[] = [
-  { name: "Air & Fuel Delivery", count: 1, image: productBrakeDisc, icon: "⛽" },
-  { name: "Exterior & Accessories", count: 1, image: productTire, icon: "🚗" },
-  { name: "Headlights & Lighting", count: 4, image: productHeadlight, icon: "💡" },
-  { name: "Brakes & Rotors", count: 4, image: productBrakeDisc, icon: "🔧" },
-  { name: "Engines & Components", count: 1, image: productOil, icon: "⚙️" },
-  { name: "Electrical", count: 1, image: productBattery, icon: "🔌" },
-  { name: "Interior", count: 2, image: productSuspension, icon: "🪑" },
-  { name: "Suspension", count: 2, image: productSuspension, icon: "🏎️" },
+  { name: "Air & Fuel Delivery", count: 23, image: productBrakeDisc, icon: "⛽" },
+  { name: "Exterior & Accessories", count: 20, image: productTire, icon: "🚗" },
+  { name: "Headlights & Lighting", count: 19, image: productHeadlight, icon: "💡" },
+  { name: "Brakes & Rotors", count: 22, image: productBrakeDisc, icon: "🔧" },
+  { name: "Engines & Components", count: 32, image: productOil, icon: "⚙️" },
+  { name: "Electrical", count: 16, image: productBattery, icon: "🔌" },
+  { name: "Interior", count: 10, image: productSuspension, icon: "🪑" },
+  { name: "Suspension", count: 19, image: productSuspension, icon: "🏎️" },
 ];
 
 /* ================= PRODUCTS ================= */
