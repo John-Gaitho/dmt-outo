@@ -27,10 +27,9 @@ const CHART_COLORS = ["#f97316", "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#0
 
 const AdminPage = () => {
   const { products, orders: storeOrders, addProduct, updateProduct, deleteProduct, updateOrderStatus } = useStore();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>(storeOrders);
   
-  // Sync orders from store
-  useState(() => { setOrders(storeOrders); });
+  useEffect(() => { setOrders(storeOrders); }, [storeOrders]);
   
   const deleteOrder = (orderId: string) => {
     setOrders(prev => prev.filter(o => o.id !== orderId));
@@ -736,7 +735,7 @@ const OrdersTab = ({ orders, onUpdateStatus, onDeleteOrder }: any) => {
 };
 
 /* ============ CUSTOMERS TAB ============ */
-const CustomersTab = ({ orders }: any) => {
+const CustomersTab = ({ orders, onDeleteCustomer }: any) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const customers = useMemo(() => {
@@ -774,7 +773,7 @@ const CustomersTab = ({ orders }: any) => {
       <div className="bg-card border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-xs min-w-[450px]">
           <thead><tr className="border-b border-border bg-muted/50 text-left text-[10px] text-muted-foreground">
-            <th className="p-2.5 font-medium">Customer</th><th className="p-2.5 font-medium">Orders</th><th className="p-2.5 font-medium">Items</th><th className="p-2.5 font-medium">Total Spent</th><th className="p-2.5 font-medium">Last Order</th>
+            <th className="p-2.5 font-medium">Customer</th><th className="p-2.5 font-medium">Orders</th><th className="p-2.5 font-medium">Items</th><th className="p-2.5 font-medium">Total Spent</th><th className="p-2.5 font-medium">Last Order</th><th className="p-2.5 font-medium">Actions</th>
           </tr></thead>
           <tbody>
             {filtered.map((c) => (
@@ -792,6 +791,12 @@ const CustomersTab = ({ orders }: any) => {
                 <td className="p-2.5 text-muted-foreground">{c.items}</td>
                 <td className="p-2.5 font-medium text-foreground">KSH {c.total.toLocaleString()}</td>
                 <td className="p-2.5 text-muted-foreground text-[10px]">{c.lastOrder}</td>
+                <td className="p-2.5">
+                  <button onClick={() => { if (confirm(`Delete customer ${c.name} and all their orders?`)) { onDeleteCustomer(c.email); toast.success("Customer deleted"); } }}
+                    className="p-1 border border-border rounded hover:bg-destructive/10 text-destructive" title="Delete">
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
