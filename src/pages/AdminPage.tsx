@@ -639,7 +639,7 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
 };
 
 /* ============ ORDERS TAB ============ */
-const OrdersTab = ({ orders, onUpdateStatus }: any) => {
+const OrdersTab = ({ orders, onUpdateStatus, onDeleteOrder }: any) => {
   const [filterStatus, setFilterStatus] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [editingOrder, setEditingOrder] = useState<string | null>(null);
