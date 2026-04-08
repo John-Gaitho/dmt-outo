@@ -1,8 +1,14 @@
 import { useStore } from "@/context/StoreContext";
+import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 
 const FloatingProducts = () => {
   const { products } = useStore();
+  const { user } = useAuth(); // get logged-in user
+
+  // Check if admin
+  const isAdmin = user?.role === "admin";
+
   const display = products.slice(0, 12);
   const doubled = [...display, ...display];
 
@@ -12,9 +18,10 @@ const FloatingProducts = () => {
     <section className="py-6 overflow-hidden">
       <div className="container mb-4">
         <h2 className="text-lg font-bold text-foreground text-center">
-          🔥 Trending Products
+          Trending Products
         </h2>
       </div>
+
       <div className="floating-slider">
         <div className="floating-track">
           {doubled.map((p, i) => (
@@ -24,6 +31,8 @@ const FloatingProducts = () => {
               className="flex-shrink-0 w-[140px] md:w-[180px] group"
             >
               <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                
+                {/* Product Image */}
                 <div className="h-[120px] md:h-[150px] overflow-hidden bg-muted">
                   <img
                     src={p.images[0]}
@@ -32,10 +41,22 @@ const FloatingProducts = () => {
                     loading="lazy"
                   />
                 </div>
+
+                {/* Product Info */}
                 <div className="p-2">
-                  <p className="text-[11px] font-semibold text-foreground truncate">{p.name}</p>
-                  <p className="text-xs font-bold text-primary">KSH {p.price.toLocaleString()}</p>
+                  <p className="text-[11px] font-semibold text-foreground truncate">
+                    {p.name}
+                  </p>
+
+                  {/* Show price only to admin */}
+                  {isAdmin && (
+                    <p className="text-xs font-bold text-primary">
+                      KSH {p.price.toLocaleString()}
+                    </p>
+                  )}
+
                 </div>
+
               </div>
             </Link>
           ))}
@@ -61,6 +82,7 @@ const FloatingProducts = () => {
           animation-play-state: paused;
         }
       `}</style>
+
     </section>
   );
 };
