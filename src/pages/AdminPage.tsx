@@ -26,7 +26,7 @@ type Tab = "dashboard" | "products" | "orders" | "customers" | "reports" | "sett
 const CHART_COLORS = ["#f97316", "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#06b6d4", "#f59e0b", "#ec4899"];
 
 const AdminPage = () => {
-  const { products, orders, addProduct, updateProduct, deleteProduct, updateOrderStatus } = useStore();
+  const { products, orders: storeOrders, addProduct, updateProduct, deleteProduct, updateOrderStatus } = useStore();
   const { user, isAdmin, isLoading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
