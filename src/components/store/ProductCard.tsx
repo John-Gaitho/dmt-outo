@@ -28,7 +28,16 @@ const ProductCard = ({ product, showCountdown }: ProductCardProps) => {
 
   return (
     <div className="bg-card border border-border rounded-lg p-3 group relative hover:shadow-md transition-shadow">
-      {product.discount && (
+      {editing && <InlineProductEdit product={product} onClose={() => setEditing(false)} />}
+      {isAdmin && (
+        <button
+          onClick={() => setEditing(true)}
+          className="absolute top-2 right-10 z-10 p-1 rounded-full hover:bg-muted transition-colors bg-card/80"
+          title="Edit product"
+        >
+          <Pencil className="w-4 h-4 text-primary" />
+        </button>
+      )}
         <span className="absolute top-2 left-2 bg-sale-badge text-sale-badge-foreground text-[10px] font-bold px-2 py-0.5 rounded z-10">
           -{product.discount}%
         </span>
