@@ -1,8 +1,10 @@
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { useStore } from "@/context/StoreContext";
 import { useAuth } from "@/context/AuthContext";
 import { Product } from "@/data/store";
+import InlineProductEdit from "./InlineProductEdit";
 
 interface ProductCardProps {
   product: Product;
@@ -22,9 +24,20 @@ const ProductCard = ({ product, showCountdown }: ProductCardProps) => {
   const { isAdmin } = useAuth();
   const isWished = wishlist.includes(product.id);
   const displayImage = product.images && product.images.length > 0 ? product.images[0] : product.image;
+  const [editing, setEditing] = useState(false);
 
   return (
     <div className="bg-card border border-border rounded-lg p-3 group relative hover:shadow-md transition-shadow">
+      {editing && <InlineProductEdit product={product} onClose={() => setEditing(false)} />}
+      {isAdmin && (
+        <button
+          onClick={() => setEditing(true)}
+          className="absolute top-2 right-10 z-10 p-1 rounded-full hover:bg-muted transition-colors bg-card/80"
+          title="Edit product"
+        >
+          <Pencil className="w-4 h-4 text-primary" />
+        </button>
+      )}
       {product.discount && (
         <span className="absolute top-2 left-2 bg-sale-badge text-sale-badge-foreground text-[10px] font-bold px-2 py-0.5 rounded z-10">
           -{product.discount}%
