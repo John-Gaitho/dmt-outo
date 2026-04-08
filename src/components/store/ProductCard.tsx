@@ -24,6 +24,7 @@ const ProductCard = ({ product, showCountdown }: ProductCardProps) => {
   const { isAdmin } = useAuth();
   const isWished = wishlist.includes(product.id);
   const displayImage = product.images && product.images.length > 0 ? product.images[0] : product.image;
+  const [editing, setEditing] = useState(false);
 
   return (
     <div className="bg-card border border-border rounded-lg p-3 group relative hover:shadow-md transition-shadow">
