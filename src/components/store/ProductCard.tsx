@@ -1,8 +1,10 @@
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { useStore } from "@/context/StoreContext";
 import { useAuth } from "@/context/AuthContext";
 import { Product } from "@/data/store";
+import InlineProductEdit from "./InlineProductEdit";
 
 interface ProductCardProps {
   product: Product;
