@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Product } from "@/data/store";
-import { X, Save, Plus, Trash2 } from "lucide-react";
+import { X, Save, Plus, Trash2, Upload, Loader2 } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface Props {
@@ -13,7 +14,27 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
   const { updateProduct } = useStore();
   const [form, setForm] = useState({ ...product });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [newImage, setNewImage] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const ext = file.name.split(".").pop();
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage.from("product-images").upload(path, file);
+        if (error) { toast.error(`Upload failed: ${error.message}`); continue; }
+        const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(path);
+        set("images", [...(form.images || []), urlData.publicUrl]);
+      }
+      toast.success("Image(s) uploaded!");
+    } catch { toast.error("Upload failed"); }
+    finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ""; }
+  };
 
   const set = (key: string, value: any) => setForm((p) => ({ ...p, [key]: value }));
 
@@ -159,6 +180,17 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
               <input className={`${inputCls} flex-1`} placeholder="Image URL..." value={newImage} onChange={(e) => setNewImage(e.target.value)} />
               <button onClick={addImage} className="px-3 py-2 bg-primary text-primary-foreground rounded-md text-sm hover:opacity-90">
                 <Plus className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="mt-2">
+              <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileUpload} />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="px-4 py-2 text-sm border border-dashed border-primary rounded-md hover:bg-primary/10 flex items-center gap-2 text-primary disabled:opacity-50"
+              >
+                {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                {uploading ? "Uploading..." : "Upload from device"}
               </button>
             </div>
           </div>
