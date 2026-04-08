@@ -38,6 +38,7 @@ const ProductCard = ({ product, showCountdown }: ProductCardProps) => {
           <Pencil className="w-4 h-4 text-primary" />
         </button>
       )}
+      {product.discount && (
         <span className="absolute top-2 left-2 bg-sale-badge text-sale-badge-foreground text-[10px] font-bold px-2 py-0.5 rounded z-10">
           -{product.discount}%
         </span>
