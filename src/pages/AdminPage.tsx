@@ -27,6 +27,14 @@ const CHART_COLORS = ["#f97316", "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#0
 
 const AdminPage = () => {
   const { products, orders: storeOrders, addProduct, updateProduct, deleteProduct, updateOrderStatus } = useStore();
+  const [orders, setOrders] = useState<Order[]>([]);
+  
+  // Sync orders from store
+  useState(() => { setOrders(storeOrders); });
+  
+  const deleteOrder = (orderId: string) => {
+    setOrders(prev => prev.filter(o => o.id !== orderId));
+  };
   const { user, isAdmin, isLoading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
