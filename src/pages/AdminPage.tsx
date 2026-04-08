@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useStore } from "@/context/StoreContext";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -26,7 +26,14 @@ type Tab = "dashboard" | "products" | "orders" | "customers" | "reports" | "sett
 const CHART_COLORS = ["#f97316", "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#06b6d4", "#f59e0b", "#ec4899"];
 
 const AdminPage = () => {
-  const { products, orders, addProduct, updateProduct, deleteProduct, updateOrderStatus } = useStore();
+  const { products, orders: storeOrders, addProduct, updateProduct, deleteProduct, updateOrderStatus } = useStore();
+  const [orders, setOrders] = useState<Order[]>(storeOrders);
+  
+  useEffect(() => { setOrders(storeOrders); }, [storeOrders]);
+  
+  const deleteOrder = (orderId: string) => {
+    setOrders(prev => prev.filter(o => o.id !== orderId));
+  };
   const { user, isAdmin, isLoading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
@@ -111,7 +118,11 @@ const AdminPage = () => {
 
       {/* Mobile bottom nav */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 flex safe-area-pb">
-        {sidebarItems.slice(0, 5).map((item) => (
+        <Link to="/" className="flex-1 flex flex-col items-center py-2 text-[9px] text-muted-foreground">
+          <Eye className="w-4 h-4 mb-0.5" />
+          <span>Home</span>
+        </Link>
+        {sidebarItems.slice(0, 4).map((item) => (
           <button key={item.tab} onClick={() => setActiveTab(item.tab)}
             className={`flex-1 flex flex-col items-center py-2 text-[9px] relative ${activeTab === item.tab ? "text-primary" : "text-muted-foreground"}`}>
             <item.icon className="w-4 h-4 mb-0.5" />
@@ -158,8 +169,8 @@ const AdminPage = () => {
               lowStockProducts={lowStockProducts}
             />
           )}
-          {activeTab === "orders" && <OrdersTab orders={orders} onUpdateStatus={updateOrderStatus} />}
-          {activeTab === "customers" && <CustomersTab orders={orders} />}
+          {activeTab === "orders" && <OrdersTab orders={orders} onUpdateStatus={updateOrderStatus} onDeleteOrder={deleteOrder} />}
+          {activeTab === "customers" && <CustomersTab orders={orders} onDeleteCustomer={(email: string) => setOrders(prev => prev.filter(o => o.email !== email))} />}
           {activeTab === "reports" && <ReportsTab orders={orders} products={products} />}
           {activeTab === "settings" && <SettingsTab onSignOut={signOut} />}
         </div>
@@ -627,7 +638,7 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
 };
 
 /* ============ ORDERS TAB ============ */
-const OrdersTab = ({ orders, onUpdateStatus }: any) => {
+const OrdersTab = ({ orders, onUpdateStatus, onDeleteOrder }: any) => {
   const [filterStatus, setFilterStatus] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [editingOrder, setEditingOrder] = useState<string | null>(null);
@@ -701,13 +712,17 @@ const OrdersTab = ({ orders, onUpdateStatus }: any) => {
                 <td className="p-2.5 font-medium text-foreground">KSH {order.total.toLocaleString()}</td>
                 <td className="p-2.5"><StatusBadge status={order.status} /></td>
                 <td className="p-2.5 text-muted-foreground text-[10px]">{order.date}</td>
-                <td className="p-2.5">
+                <td className="p-2.5 flex items-center gap-1">
                   <select value={order.status}
                     onChange={e => { onUpdateStatus(order.id, e.target.value); toast.success(`Order ${order.id} → ${e.target.value}`); }}
                     className="border border-border rounded px-1.5 py-1 text-[10px] bg-background text-foreground">
                     <option value="pending">Pending</option><option value="processing">Processing</option>
                     <option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option>
                   </select>
+                  <button onClick={() => { if (confirm(`Delete order ${order.id}?`)) { onDeleteOrder(order.id); toast.success("Order deleted"); } }}
+                    className="p-1 border border-border rounded hover:bg-destructive/10 text-destructive" title="Delete">
+                    <Trash2 className="w-3 h-3" />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -720,7 +735,7 @@ const OrdersTab = ({ orders, onUpdateStatus }: any) => {
 };
 
 /* ============ CUSTOMERS TAB ============ */
-const CustomersTab = ({ orders }: any) => {
+const CustomersTab = ({ orders, onDeleteCustomer }: any) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const customers = useMemo(() => {
@@ -758,7 +773,7 @@ const CustomersTab = ({ orders }: any) => {
       <div className="bg-card border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-xs min-w-[450px]">
           <thead><tr className="border-b border-border bg-muted/50 text-left text-[10px] text-muted-foreground">
-            <th className="p-2.5 font-medium">Customer</th><th className="p-2.5 font-medium">Orders</th><th className="p-2.5 font-medium">Items</th><th className="p-2.5 font-medium">Total Spent</th><th className="p-2.5 font-medium">Last Order</th>
+            <th className="p-2.5 font-medium">Customer</th><th className="p-2.5 font-medium">Orders</th><th className="p-2.5 font-medium">Items</th><th className="p-2.5 font-medium">Total Spent</th><th className="p-2.5 font-medium">Last Order</th><th className="p-2.5 font-medium">Actions</th>
           </tr></thead>
           <tbody>
             {filtered.map((c) => (
@@ -776,6 +791,12 @@ const CustomersTab = ({ orders }: any) => {
                 <td className="p-2.5 text-muted-foreground">{c.items}</td>
                 <td className="p-2.5 font-medium text-foreground">KSH {c.total.toLocaleString()}</td>
                 <td className="p-2.5 text-muted-foreground text-[10px]">{c.lastOrder}</td>
+                <td className="p-2.5">
+                  <button onClick={() => { if (confirm(`Delete customer ${c.name} and all their orders?`)) { onDeleteCustomer(c.email); toast.success("Customer deleted"); } }}
+                    className="p-1 border border-border rounded hover:bg-destructive/10 text-destructive" title="Delete">
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

@@ -57,7 +57,7 @@ const HeroSection = () => {
                 key={i}
                 src={s.image}
                 alt={s.title}
-                className={`absolute inset-0 w-full h-full object-contain md:object-cover object-center transition-all duration-1000 ${
+                className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-1000 ${
                   i === current ? "opacity-100 scale-100" : "opacity-0 scale-105"
                 }`}
               />
