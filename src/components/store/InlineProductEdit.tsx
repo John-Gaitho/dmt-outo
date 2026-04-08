@@ -182,6 +182,17 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
                 <Plus className="w-4 h-4" />
               </button>
             </div>
+            <div className="mt-2">
+              <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileUpload} />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="px-4 py-2 text-sm border border-dashed border-primary rounded-md hover:bg-primary/10 flex items-center gap-2 text-primary disabled:opacity-50"
+              >
+                {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                {uploading ? "Uploading..." : "Upload from device"}
+              </button>
+            </div>
           </div>
         </div>
 
