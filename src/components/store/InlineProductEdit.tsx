@@ -14,7 +14,27 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
   const { updateProduct } = useStore();
   const [form, setForm] = useState({ ...product });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [newImage, setNewImage] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const ext = file.name.split(".").pop();
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage.from("product-images").upload(path, file);
+        if (error) { toast.error(`Upload failed: ${error.message}`); continue; }
+        const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(path);
+        set("images", [...(form.images || []), urlData.publicUrl]);
+      }
+      toast.success("Image(s) uploaded!");
+    } catch { toast.error("Upload failed"); }
+    finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ""; }
+  };
 
   const set = (key: string, value: any) => setForm((p) => ({ ...p, [key]: value }));
 
