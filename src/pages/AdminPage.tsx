@@ -170,8 +170,8 @@ const AdminPage = () => {
               lowStockProducts={lowStockProducts}
             />
           )}
-          {activeTab === "orders" && <OrdersTab orders={orders} onUpdateStatus={updateOrderStatus} />}
-          {activeTab === "customers" && <CustomersTab orders={orders} />}
+          {activeTab === "orders" && <OrdersTab orders={orders} onUpdateStatus={updateOrderStatus} onDeleteOrder={deleteOrder} />}
+          {activeTab === "customers" && <CustomersTab orders={orders} onDeleteCustomer={(email: string) => setOrders(prev => prev.filter(o => o.email !== email))} />}
           {activeTab === "reports" && <ReportsTab orders={orders} products={products} />}
           {activeTab === "settings" && <SettingsTab onSignOut={signOut} />}
         </div>
