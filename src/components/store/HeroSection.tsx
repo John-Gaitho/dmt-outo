@@ -57,6 +57,11 @@ const HeroSection = () => {
                 key={i}
                 src={s.image}
                 alt={s.title}
+                width={960}
+                height={480}
+                loading={i === 0 ? "eager" : "lazy"}
+                fetchPriority={i === 0 ? "high" : "auto"}
+                decoding={i === 0 ? "sync" : "async"}
                 className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-1000 ${
                   i === current ? "opacity-100 scale-100" : "opacity-0 scale-105"
                 }`}
@@ -115,7 +120,11 @@ const HeroSection = () => {
             <div className="relative h-1/2 rounded-lg overflow-hidden group cursor-pointer">
               <img
                 src={promoTires}
-                alt="New Tires"
+                alt="Premium engine oil products at DMT Spares"
+                width={400}
+                height={200}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform"
               />
               <div className="absolute inset-0 bg-black/40" />
@@ -138,7 +147,11 @@ const HeroSection = () => {
             <div className="relative h-1/2 rounded-lg overflow-hidden group cursor-pointer">
               <img
                 src={promoAudio}
-                alt="HiFi Audio"
+                alt="Ex-Japan auto parts available at DMT Spares"
+                width={400}
+                height={200}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform"
               />
               <div className="absolute inset-0 bg-black/40" />

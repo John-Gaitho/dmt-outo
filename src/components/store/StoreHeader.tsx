@@ -56,8 +56,8 @@ shadow-lg text-white backdrop-blur-md">
             <Menu className="w-6 h-6 text-white" />
           </button>
 
-          <Link to="/">
-            <img src={logo} className="h-11" />
+          <Link to="/" aria-label="DMT Spares Home">
+            <img src={logo} className="h-11" alt="DMT Spares logo" width={44} height={44} />
           </Link>
         </div>
 
@@ -182,8 +182,8 @@ shadow-lg text-white backdrop-blur-md">
         <div className="container flex items-center gap-8 py-3 bg-white text-gray-800">
 
           {/* LOGO */}
-          <Link to="/" className="shrink-0">
-            <img src={logo} className="h-14" />
+          <Link to="/" className="shrink-0" aria-label="DMT Spares Home">
+            <img src={logo} className="h-14" alt="DMT Spares logo" width={56} height={56} />
           </Link>
 
           {/* SEARCH */}
@@ -347,27 +347,6 @@ shadow-lg text-white backdrop-blur-md">
         </div>
 
       )}
-
-      {/* BADGE STYLE */}
-      <style>{`
-
-        .badge {
-          position: absolute;
-          top: -6px;
-          right: -6px;
-          background: #ef4444;
-          color: white;
-          font-size: 10px;
-          width: 16px;
-          height: 16px;
-          border-radius: 999px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: bold;
-        }
-
-      `}</style>
 
     </header>
   );
