@@ -5,6 +5,7 @@ import { useStore } from "@/context/StoreContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ProductCard from "./ProductCard";
 import { categories } from "@/data/store";
+import promoVideo from "@/assets/promo-3.mp4";
 
 type Tab = "new" | "featured" | "popular";
 
@@ -122,13 +123,13 @@ const WhatWeOffer = () => {
             {/* 🎥 Video Promo Banner */}
             <div className="mt-6 relative overflow-hidden rounded-lg border border-border">
               <video
-                className="w-full h-70 object-cover"
-                src="src/assets/promo-3.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-              />
+  className="w-full h-70 object-cover"
+  src={promoVideo}
+  autoPlay
+  loop
+  muted
+  playsInline
+/>
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-center justify-center">
                 <div className="text-center">
