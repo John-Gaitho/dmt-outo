@@ -135,6 +135,23 @@
     background-color: hsl(var(--warning));
   }
 }
+
+/* Badge style (cart/wishlist counts) */
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: hsl(var(--sale-badge));
+  color: hsl(var(--sale-badge-foreground));
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
 /* ================= Ken Burns Animations ================= */
 
 @keyframes kenburnsLeft {
