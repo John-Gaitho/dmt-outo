@@ -1,5 +1,4 @@
 import StoreHeader from "@/components/store/StoreHeader";
-import StoreFooter from "@/components/store/StoreFooter";
 import MobileBottomNav from "@/components/store/MobileBottomNav";
 import ProductCard from "@/components/store/ProductCard";
 import SmartBanner from "@/components/store/SmartBanner";
@@ -8,6 +7,8 @@ import InlineBanner from "@/components/store/InlineBanner";
 import { useStore } from "@/context/StoreContext";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+
+import { ChevronDown } from "lucide-react";
 
 import { categories } from "@/data/store";
 
@@ -23,11 +24,22 @@ import bannerSuspension from "@/assets/product-suspension.png";
 
 const PRODUCTS_PER_PAGE = 12;
 
-/* Shuffle Function */
+/* ================= SHUFFLE ================= */
 
 const shuffleArray = (array: any[]) => {
   return [...array].sort(() => Math.random() - 0.5);
 };
+
+/* ================= SKELETON ================= */
+
+const ProductSkeleton = () => (
+  <div className="border rounded-lg p-3 animate-pulse">
+    <div className="w-full h-28 bg-muted rounded mb-3" />
+    <div className="h-3 bg-muted rounded w-3/4 mb-2" />
+    <div className="h-3 bg-muted rounded w-1/2 mb-2" />
+    <div className="h-4 bg-muted rounded w-1/3" />
+  </div>
+);
 
 const ShopPage = () => {
 
@@ -51,77 +63,71 @@ const ShopPage = () => {
   const [shuffledProducts, setShuffledProducts] =
     useState(products);
 
-  /* ================= SIDE BANNERS ================= */
+  const [loading, setLoading] =
+    useState(true);
+
+  const [showCategories, setShowCategories] =
+    useState(false);
+
+/* ================= SIDE BANNERS ================= */
 
   const leftBanners = [
-
     {
       image: bannerBrake,
       link: "/shop?category=Brakes",
       category: "Brakes",
     },
-
     {
       image: bannerTyre,
       link: "/shop?category=Tyres",
       category: "Tyres",
     },
-
     {
       image: bannerBattery,
       link: "/shop?category=Battery",
       category: "Battery",
     },
-
   ];
 
   const rightBanners = [
-
     {
       image: bannerOil,
       link: "/shop?category=Engine Oil",
       category: "Engine Oil",
     },
-
     {
       image: bannerSuspension,
       link: "/shop?category=Suspension",
       category: "Suspension",
     },
-
     {
       image: bannerTyre,
       link: "/shop?category=Tyres",
       category: "Tyres",
     },
-
   ];
 
-  /* ================= INLINE BANNERS ================= */
+/* ================= INLINE BANNERS ================= */
 
   const inlineBanners = [
-
     {
       image: bannerBrake,
       link: "/shop?category=Brakes",
       text: "🔥 Up to 20% Off Brake Parts",
     },
-
     {
       image: bannerTyre,
       link: "/shop?category=Tyres",
       text: "🚗 Get Your Tires Checked Today!",
     },
-
     {
       image: bannerBattery,
       link: "/shop?category=Battery",
       text: "⚡ Power Up with New Batteries",
     },
-
   ];
 
-  /* ================= URL PARAMS ================= */
+/* ================= URL PARAMS ================= */
 
   const urlCategory =
     searchParams.get("category") || "";
@@ -129,17 +135,27 @@ const ShopPage = () => {
   const urlQuery =
     searchParams.get("q") || "";
 
-  /* ================= SHUFFLE ================= */
+/* ================= SHUFFLE ================= */
 
   useEffect(() => {
 
-    setShuffledProducts(
-      shuffleArray(products)
-    );
+    setLoading(true);
+
+    const timer = setTimeout(() => {
+
+      setShuffledProducts(
+        shuffleArray(products)
+      );
+
+      setLoading(false);
+
+    }, 500);
+
+    return () => clearTimeout(timer);
 
   }, [products]);
 
-  /* ================= CATEGORY ================= */
+/* ================= CATEGORY ================= */
 
   useEffect(() => {
 
@@ -153,7 +169,7 @@ const ShopPage = () => {
 
   }, [urlCategory]);
 
-  /* ================= SEARCH ================= */
+/* ================= SEARCH ================= */
 
   useEffect(() => {
 
@@ -173,7 +189,7 @@ const ShopPage = () => {
 
   }, [searchQuery]);
 
-  /* ================= RESET PAGE ================= */
+/* ================= RESET PAGE ================= */
 
   useEffect(() => {
 
@@ -181,7 +197,18 @@ const ShopPage = () => {
 
   }, [selectedCategory, localSearch, sortBy]);
 
-  /* ================= FILTER ================= */
+/* ================= SCROLL TO TOP ================= */
+
+  useEffect(() => {
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
+  }, [currentPage]);
+
+/* ================= FILTER ================= */
 
   let filtered = shuffledProducts.filter(
     (p) => {
@@ -213,33 +240,21 @@ const ShopPage = () => {
     }
   );
 
-  /* ================= SORT ================= */
+/* ================= SORT ================= */
 
   if (sortBy === "price-low") {
-
-    filtered.sort(
-      (a, b) => a.price - b.price
-    );
-
+    filtered.sort((a, b) => a.price - b.price);
   }
 
   if (sortBy === "price-high") {
-
-    filtered.sort(
-      (a, b) => b.price - a.price
-    );
-
+    filtered.sort((a, b) => b.price - a.price);
   }
 
   if (sortBy === "rating") {
-
-    filtered.sort(
-      (a, b) => b.rating - a.rating
-    );
-
+    filtered.sort((a, b) => b.rating - a.rating);
   }
 
-  /* ================= PAGINATION ================= */
+/* ================= PAGINATION ================= */
 
   const totalPages =
     Math.ceil(
@@ -260,289 +275,269 @@ const ShopPage = () => {
 
   return (
 
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
+<div className="min-h-screen bg-background pb-16 md:pb-0">
 
-      <StoreHeader />
+<StoreHeader />
 
-      <div className="container py-6">
+<div className="container py-6">
 
-        {/* ================= GRID ================= */}
+<div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
 
-        <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
+{/* LEFT BANNERS */}
 
-          {/* LEFT SIDE */}
+<div className="hidden lg:block lg:col-span-1">
 
-          <div className="hidden lg:block lg:col-span-1">
+<div className="sticky top-24 space-y-4">
 
-            <div className="sticky top-24 space-y-4">
+<SmartBanner
+banners={leftBanners}
+selectedCategory={selectedCategory}
+interval={5000}
+/>
 
-              <SmartBanner
-                banners={leftBanners}
-                selectedCategory={selectedCategory}
-                interval={5000}
-              />
+<SmartBanner
+banners={leftBanners}
+selectedCategory={selectedCategory}
+interval={6500}
+/>
 
-              <SmartBanner
-                banners={leftBanners}
-                selectedCategory={selectedCategory}
-                interval={6500}
-              />
+</div>
 
-            </div>
+</div>
 
-          </div>
+{/* SIDEBAR */}
 
-          {/* SIDEBAR */}
+<aside className="space-y-4 lg:col-span-1">
 
-          <aside className="space-y-4 lg:col-span-1">
+{/* SEARCH */}
 
-            {/* SEARCH */}
+<div className="bg-card border rounded-lg p-4">
 
-            <div className="bg-card border rounded-lg p-4">
+<h3 className="font-semibold text-sm mb-3">
+Search
+</h3>
 
-              <h3 className="font-semibold text-sm mb-3">
-                Search
-              </h3>
+<input
+type="text"
+placeholder="Search products..."
+value={localSearch}
+onChange={(e) => {
 
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={localSearch}
-                onChange={(e) => {
+setLocalSearch(e.target.value);
+setSearchQuery(e.target.value);
 
-                  setLocalSearch(
-                    e.target.value
-                  );
+}}
+className="w-full border rounded px-3 py-2 text-sm"
+/>
 
-                  setSearchQuery(
-                    e.target.value
-                  );
+</div>
 
-                }}
-                className="w-full border rounded px-3 py-2 text-sm"
-              />
+{/* CATEGORIES */}
 
-            </div>
+<div className="bg-card border rounded-lg p-4">
 
-            {/* CATEGORIES */}
+<button
+onClick={() =>
+setShowCategories((prev) => !prev)
+}
+className="w-full flex items-center justify-between"
+>
 
-            <div className="bg-card border rounded-lg p-4">
+<h3 className="font-semibold text-sm">
+Categories
+</h3>
 
-              <h3 className="font-semibold text-sm mb-3">
-                Categories
-              </h3>
+<ChevronDown
+className={`w-4 h-4 transition-transform lg:hidden ${
+showCategories ? "rotate-180" : ""
+}`}
+/>
 
-              <ul className="space-y-1.5">
+</button>
 
-                <li>
+<div
+className={`overflow-hidden transition-all duration-300 ${
+showCategories
+? "max-h-96 mt-3"
+: "max-h-0 lg:max-h-full lg:mt-3"
+}`}
+>
 
-                  <button
-                    onClick={() =>
-                      setSelectedCategory("")
-                    }
-                    className="text-xs w-full text-left py-1 px-2 rounded hover:bg-muted"
-                  >
-                    All Products
-                  </button>
+<ul className="space-y-1.5">
 
-                </li>
+<li>
 
-                {categories.map((cat) => (
+<button
+onClick={() =>
+setSelectedCategory("")
+}
+className="text-xs w-full text-left py-1 px-2 rounded hover:bg-muted"
+>
+All Products
+</button>
 
-                  <li key={cat.name}>
+</li>
 
-                    <button
-                      onClick={() =>
-                        setSelectedCategory(
-                          cat.name
-                        )
-                      }
-                      className="text-xs w-full text-left py-1 px-2 rounded hover:bg-muted"
-                    >
+{categories.map((cat) => (
 
-                      {cat.name}
+<li key={cat.name}>
 
-                    </button>
+<button
+onClick={() => {
 
-                  </li>
+setSelectedCategory(cat.name);
+setShowCategories(false);
 
-                ))}
+}}
+className="text-xs w-full text-left py-1 px-2 rounded hover:bg-muted"
+>
 
-              </ul>
+{cat.name}
 
-            </div>
+</button>
 
-          </aside>
+</li>
 
-          {/* PRODUCTS */}
+))}
 
-          <div className="lg:col-span-3">
+</ul>
 
-            {/* TOP BAR */}
+</div>
 
-            <div className="flex justify-between items-center mb-4">
+</div>
 
-              <p className="text-sm text-muted-foreground">
-                Showing {filtered.length} products
-              </p>
+</aside>
 
-              <select
-                value={sortBy}
-                onChange={(e) =>
-                  setSortBy(e.target.value)
-                }
-                className="border rounded px-3 py-1.5 text-xs"
-              >
+{/* PRODUCTS */}
 
-                <option value="default">
-                  Default Sorting
-                </option>
+<div className="lg:col-span-3">
 
-                <option value="price-low">
-                  Price: Low to High
-                </option>
+{/* GRID */}
 
-                <option value="price-high">
-                  Price: High to Low
-                </option>
+<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
 
-                <option value="rating">
-                  Highest Rated
-                </option>
+{loading
+? Array.from({ length: 12 }).map((_, i) => (
+<ProductSkeleton key={i} />
+))
+: paginatedProducts.map(
+(product, index) => {
 
-              </select>
+const showBanner =
+index > 0 &&
+index % 8 === 0;
 
-            </div>
+return (
 
-            {/* PRODUCT GRID */}
+<>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+{showBanner && (
 
-              {paginatedProducts.map(
-                (product, index) => {
+<InlineBanner
+key={`banner-${index}`}
+banners={inlineBanners}
+/>
 
-                  const showBanner =
-                    index > 0 &&
-                    index % 8 === 0;
+)}
 
-                  return (
+<ProductCard
+key={product.id}
+product={product}
+/>
 
-                    <>
+</>
 
-                      {showBanner && (
+);
 
-                        <InlineBanner
-                          key={`banner-${index}`}
-                          banners={inlineBanners}
-                        />
+}
+)}
 
-                      )}
+</div>
 
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                      />
+{/* PAGINATION */}
 
-                    </>
+{totalPages > 1 && (
 
-                  );
+<div className="flex justify-center mt-8 gap-2 flex-wrap">
 
-                }
-              )}
+<button
+disabled={currentPage === 1}
+onClick={() =>
+setCurrentPage((prev) => prev - 1)
+}
+className="px-3 py-1 text-sm border rounded disabled:opacity-50"
+>
+Prev
+</button>
 
-            </div>
+{Array.from(
+{ length: totalPages },
+(_, i) => (
 
-            {/* PAGINATION */}
+<button
+key={i}
+onClick={() =>
+setCurrentPage(i + 1)
+}
+className={`px-3 py-1 text-sm border rounded ${
+currentPage === i + 1
+? "bg-primary text-white"
+: ""
+}`}
+>
 
-            {totalPages > 1 && (
+{i + 1}
 
-              <div className="flex justify-center mt-8 gap-2 flex-wrap">
+</button>
 
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() =>
-                    setCurrentPage(
-                      (prev) => prev - 1
-                    )
-                  }
-                  className="px-3 py-1 text-sm border rounded"
-                >
-                  Prev
-                </button>
+)
+)}
 
-                {Array.from(
-                  { length: totalPages },
-                  (_, i) => (
+<button
+disabled={currentPage === totalPages}
+onClick={() =>
+setCurrentPage((prev) => prev + 1)
+}
+className="px-3 py-1 text-sm border rounded disabled:opacity-50"
+>
+Next
+</button>
 
-                    <button
-                      key={i}
-                      onClick={() =>
-                        setCurrentPage(i + 1)
-                      }
-                      className={`px-3 py-1 text-sm border rounded ${
-                        currentPage === i + 1
-                          ? "bg-primary text-white"
-                          : ""
-                      }`}
-                    >
+</div>
 
-                      {i + 1}
+)}
 
-                    </button>
+</div>
 
-                  )
-                )}
+{/* RIGHT BANNERS */}
 
-                <button
-                  disabled={
-                    currentPage === totalPages
-                  }
-                  onClick={() =>
-                    setCurrentPage(
-                      (prev) => prev + 1
-                    )
-                  }
-                  className="px-3 py-1 text-sm border rounded"
-                >
-                  Next
-                </button>
+<div className="hidden lg:block lg:col-span-1">
 
-              </div>
+<div className="sticky top-24 space-y-4">
 
-            )}
+<SmartBanner
+banners={rightBanners}
+selectedCategory={selectedCategory}
+interval={4000}
+/>
 
-          </div>
+<SmartBanner
+banners={rightBanners}
+selectedCategory={selectedCategory}
+interval={7000}
+/>
 
-          {/* RIGHT SIDE */}
+</div>
 
-          <div className="hidden lg:block lg:col-span-1">
+</div>
 
-            <div className="sticky top-24 space-y-4">
+</div>
 
-              <SmartBanner
-                banners={rightBanners}
-                selectedCategory={selectedCategory}
-                interval={4000}
-              />
+</div>
 
-              <SmartBanner
-                banners={rightBanners}
-                selectedCategory={selectedCategory}
-                interval={7000}
-              />
+<MobileBottomNav />
 
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <StoreFooter />
-      <MobileBottomNav />
-
-    </div>
+</div>
 
   );
 

@@ -9,12 +9,12 @@ import { categories } from "@/data/store";
 type Tab = "new" | "featured" | "popular";
 
 const brandLogos: { name: string; icon: string }[] = [
-  { name: "Toyota", icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Toyota.svg/200px-Toyota.svg.png" },
-  { name: "Honda", icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Honda_logo2.svg/200px-Honda_logo2.svg.png" },
-  { name: "BMW", icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/BMW.svg/200px-BMW.svg.png" },
-  { name: "Ford", icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Ford_Motor_Company_Logo.svg/200px-Ford_Motor_Company_Logo.svg.png" },
-  { name: "Mercedes", icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Mercedes-Benz_Logo_2010.svg/200px-Mercedes-Benz_Logo_2010.svg.png" },
-  { name: "Subaru", icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Subaru_logo.svg/200px-Subaru_logo.svg.png" },
+  { name: "Toyota", icon: "https://i.pinimg.com/1200x/84/a2/ff/84a2ffcc555d2f1f1d0a260e67c86b1a.jpg" },
+  { name: "Honda", icon: "https://i.pinimg.com/1200x/fa/49/dc/fa49dcaf6ae263e7e796590c6c610cd4.jpg" },
+  { name: "Suzuki", icon: "https://i.pinimg.com/1200x/1c/9e/c6/1c9ec6156fd4bfaa456dd2e8decfd9aa.jpg" },
+  { name: "Nissan", icon: "https://i.pinimg.com/736x/59/a5/26/59a526a3f6146549714f829936da41b4.jpg" },
+  { name: "Mazda", icon: "https://i.pinimg.com/1200x/46/6a/5c/466a5c6f476c4163a59236b8288bc15f.jpg" },
+  { name: "Subaru", icon: "https://i.pinimg.com/1200x/1d/03/06/1d0306c346c9ec9c430b8b321e6fafc5.jpg" },
 ];
 
 const WhatWeOffer = () => {
@@ -122,8 +122,8 @@ const WhatWeOffer = () => {
             {/* 🎥 Video Promo Banner */}
             <div className="mt-6 relative overflow-hidden rounded-lg border border-border">
               <video
-                className="w-full h-40 object-cover"
-                src="src\assets\promo-3.mp4"
+                className="w-full h-70 object-cover"
+                src="src/assets/promo-3.mp4"
                 autoPlay
                 loop
                 muted
