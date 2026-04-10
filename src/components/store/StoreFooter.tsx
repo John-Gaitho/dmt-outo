@@ -6,199 +6,203 @@ import {
   Facebook,
   Instagram,
   Twitter,
-  MessageCircle
+  MessageCircle,
+  ArrowRight
 } from "lucide-react";
+import { motion } from "framer-motion";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 40 },
+  show: (i = 1) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.1,
+      duration: 0.6,
+      ease: "easeOut"
+    }
+  })
+};
 
 const StoreFooter = () => (
-  <footer className="relative bg-gray-950 text-gray-300 mt-20 border-t border-gray-800">
+  <footer className="relative bg-black text-gray-300 mt-28 border-t border-gray-800 overflow-hidden">
 
-    {/* Glow Effect */}
+    {/* 🔥 MULTI-LAYER GLOW */}
     <div className="absolute inset-0 pointer-events-none">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-primary/20 blur-3xl opacity-30" />
+      <div className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-primary/20 blur-[140px] opacity-40" />
+      <div className="absolute bottom-0 left-0 w-[300px] h-[200px] bg-primary/10 blur-3xl opacity-30" />
+      <div className="absolute right-0 top-1/3 w-[200px] h-[200px] bg-purple-500/10 blur-3xl opacity-20" />
     </div>
 
-    <div className="container relative py-14">
+    <div className="container relative py-20">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-
-        {/* Company */}
+      {/* 🚀 NEWSLETTER */}
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        className="mb-20 p-8 rounded-2xl border border-gray-800 bg-white/5 backdrop-blur-xl flex flex-col md:flex-row justify-between items-center gap-6 shadow-xl"
+      >
         <div>
-          <h4 className="text-2xl font-extrabold text-white mb-4 tracking-wide">
+          <h3 className="text-2xl font-bold text-white mb-2">
+            Join the DMT Network 🚗
+          </h3>
+          <p className="text-sm text-gray-400">
+            Be first to access new stock, exclusive deals & insider offers.
+          </p>
+        </div>
+
+        <div className="flex w-full md:w-auto gap-2">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-sm focus:outline-none focus:border-primary w-full md:w-[260px]"
+          />
+          <button className="px-5 py-3 bg-primary text-white rounded-lg flex items-center gap-2 hover:scale-105 transition-all shadow-lg">
+            Subscribe <ArrowRight size={16}/>
+          </button>
+        </div>
+      </motion.div>
+
+      {/* 🔥 GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-14">
+
+        {/* BRAND */}
+        <motion.div variants={fadeUp} initial="hidden" whileInView="show" custom={1}>
+          <h4 className="text-3xl font-extrabold text-white mb-4 tracking-wide">
             DMT SPARES
           </h4>
 
           <p className="text-sm text-gray-400 leading-relaxed mb-6">
-            Your trusted auto parts store in Olkalou. We supply
-            genuine spare parts, engine oils, batteries,
-            filters, and accessories for all vehicle types
-            at competitive prices.
+            Powering your journey with genuine auto parts, reliability,
+            and unmatched service in Olkalou and beyond.
           </p>
 
-          {/* Social Links */}
           <div className="flex gap-4">
-
-            {[
-              { icon: Facebook, color: "hover:text-blue-500", link: "https://facebook.com" },
-              { icon: Instagram, color: "hover:text-pink-500", link: "https://instagram.com" },
-              { icon: Twitter, color: "hover:text-blue-400", link: "https://twitter.com" },
-              { icon: MessageCircle, color: "hover:text-green-500", link: "https://wa.me/254712345678" }
-            ].map(({ icon: Icon, color, link }, i) => (
-              <a
+            {[Facebook, Instagram, Twitter, MessageCircle].map((Icon, i) => (
+              <motion.a
+                whileHover={{ scale: 1.15 }}
                 key={i}
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition transform hover:scale-110 ${color}`}
+                href="#"
+                className="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition shadow-md"
               >
                 <Icon className="w-5 h-5" />
-              </a>
+              </motion.a>
             ))}
-
           </div>
-        </div>
+        </motion.div>
 
-        {/* Quick Links */}
-        <div>
-          <h5 className="text-white font-semibold mb-5 text-lg">
-            Quick Links
+        {/* LINKS */}
+        <motion.div variants={fadeUp} initial="hidden" whileInView="show" custom={2}>
+          <h5 className="text-white font-semibold mb-6 text-lg">
+            Explore
           </h5>
 
-          <ul className="space-y-3 text-sm">
-            {[
-              { name: "Home", path: "/" },
-              { name: "Shop", path: "/shop" },
-              { name: "About Us", path: "/about" },
-              { name: "Contact", path: "/contact" },
-              { name: "FAQ", path: "/faq" }
-            ].map((link, i) => (
+          <ul className="space-y-4 text-sm">
+            {["Home","Shop","About","Contact","FAQ"].map((item,i)=>(
               <li key={i}>
-                <Link to={link.path} className="relative inline-block group">
-                  <span className="group-hover:text-white transition">
-                    {link.name}
-                  </span>
-                  <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-primary transition-all group-hover:w-full"></span>
+                <Link
+                  to={`/${item.toLowerCase()}`}
+                  className="group flex items-center gap-3 hover:text-white transition"
+                >
+                  <span className="w-1 h-1 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition"></span>
+                  {item}
                 </Link>
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
 
-        {/* Customer Service */}
-        <div>
-          <h5 className="text-white font-semibold mb-5 text-lg">
-            Customer Service
+        {/* SERVICES */}
+        <motion.div variants={fadeUp} initial="hidden" whileInView="show" custom={3}>
+          <h5 className="text-white font-semibold mb-6 text-lg">
+            Support
           </h5>
 
-          <ul className="space-y-3 text-sm">
-            {[
-              { name: "My Account", path: "/account" },
-              { name: "Track Order", path: "/orders" },
-              { name: "Returns", path: "/returns" },
-              { name: "Shipping Info", path: "/shipping" },
-              { name: "Warranty", path: "/warranty" }
-            ].map((link, i) => (
+          <ul className="space-y-4 text-sm">
+            {["Account","Orders","Returns","Shipping","Warranty"].map((item,i)=>(
               <li key={i}>
-                <Link to={link.path} className="relative inline-block group">
-                  <span className="group-hover:text-white transition">
-                    {link.name}
-                  </span>
-                  <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-primary transition-all group-hover:w-full"></span>
+                <Link
+                  to="/"
+                  className="group flex items-center gap-3 hover:text-white transition"
+                >
+                  <span className="w-1 h-1 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition"></span>
+                  {item}
                 </Link>
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
 
-        {/* Contact */}
-        <div>
-
-          <h5 className="text-white font-semibold mb-5 text-lg">
-            Find Us
+        {/* CONTACT */}
+        <motion.div variants={fadeUp} initial="hidden" whileInView="show" custom={4}>
+          <h5 className="text-white font-semibold mb-6 text-lg">
+            Contact
           </h5>
 
-          <div className="space-y-4 text-sm mb-5">
+          <div className="space-y-5 text-sm mb-6">
 
-            <p className="flex items-center gap-3">
+            <p className="flex items-center gap-3 hover:text-white transition">
               <MapPin className="w-4 h-4 text-primary"/>
-              <a
-                href="https://maps.google.com/?q=Olkalou+Kenya"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition"
-              >
-                Olkalou Town, Nyandarua County
-              </a>
+              Olkalou Town
             </p>
 
-            <p className="flex items-center gap-3">
+            <p className="flex items-center gap-3 hover:text-white transition">
               <Phone className="w-4 h-4 text-primary"/>
-              <a href="tel:+254725798506" className="hover:text-white transition">
-                0725798506
-              </a>
+              0725798506
             </p>
 
-            <p className="flex items-center gap-3">
+            <p className="flex items-center gap-3 hover:text-white transition">
               <Mail className="w-4 h-4 text-primary"/>
-              <a href="mailto:info@dmtspares.co.ke" className="hover:text-white transition">
-                info@dmtspares.co.ke
-              </a>
+              info@dmtspares.co.ke
             </p>
 
           </div>
 
-          {/* Map */}
-          <div className="rounded-xl overflow-hidden border border-gray-800 shadow-lg hover:shadow-primary/20 transition">
+          <div className="rounded-xl overflow-hidden border border-gray-800 shadow-lg hover:scale-[1.03] transition">
             <iframe
-              src="https://maps.google.com/maps?q=Olkalou%20Town%20Kenya&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              src="https://maps.google.com/maps?q=Olkalou%20Town%20Kenya&z=14&output=embed"
               width="100%"
               height="160"
               loading="lazy"
               className="border-0"
             ></iframe>
           </div>
-
-        </div>
+        </motion.div>
 
       </div>
-
     </div>
 
-    {/* Bottom */}
-    <div className="border-t border-gray-800">
+    {/* 💎 TRUST STRIP */}
+    <div className="border-t border-gray-800 bg-gray-900/40 backdrop-blur">
+      <div className="container py-6 flex flex-wrap justify-center gap-6 text-xs text-gray-400">
+        <span>✔ Genuine Parts</span>
+        <span>✔ Fast Delivery</span>
+        <span>✔ Secure Payments</span>
+        <span>✔ Trusted by 1000+ Customers</span>
+      </div>
+    </div>
 
-      <div className="container py-5 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+    {/* 🔻 BOTTOM */}
+    <div className="border-t border-gray-800 bg-black/60 backdrop-blur">
+      <div className="container py-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
 
-        <p className="text-center md:text-left">
+        <p>
           © {new Date().getFullYear()}
-          <span className="text-white font-medium"> DMT Spares</span>. All rights reserved.
+          <span className="text-white font-medium"> DMT Spares</span>
         </p>
 
-        {/* ✅ REAL PAYMENT ICONS */}
         <div className="flex items-center gap-4 mt-3 md:mt-0 bg-gray-900 px-4 py-2 rounded-xl border border-gray-800">
-
-          <img
-            src="/payments/visa.svg"
-            alt="Visa"
-            className="h-5 opacity-80 hover:opacity-100 transition"
-          />
-
-          <img
-            src="/payments/mastercard.svg"
-            alt="Mastercard"
-            className="h-5 opacity-80 hover:opacity-100 transition"
-          />
-
-          <img
-            src="/payments/mpesa.svg"
-            alt="M-Pesa"
-            className="h-6 opacity-90 hover:opacity-100 transition"
-          />
-
+          <img src="/payments/visa.svg" className="h-5 opacity-80 hover:opacity-100 transition"/>
+          <img src="/payments/mastercard.svg" className="h-5 opacity-80 hover:opacity-100 transition"/>
+          <img src="/payments/mpesa.svg" className="h-6 opacity-90 hover:opacity-100 transition"/>
         </div>
 
       </div>
-
     </div>
+
+    
 
   </footer>
 );
