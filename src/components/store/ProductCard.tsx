@@ -52,7 +52,7 @@ const ProductCard = ({ product, showCountdown }: ProductCardProps) => {
 
       <Link to={`/product/${product.id}`}>
         <div className="aspect-square mb-3 flex items-center justify-center overflow-hidden cursor-pointer">
-          <img src={displayImage} alt={product.name} className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-200" />
+          <img src={displayImage} alt={product.name} loading="lazy" decoding="async" width={300} height={300} className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-200" />
         </div>
       </Link>
 
