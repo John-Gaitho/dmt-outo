@@ -1,150 +1,104 @@
 import StoreHeader from "@/components/store/StoreHeader";
 import StoreFooter from "@/components/store/StoreFooter";
 import MobileBottomNav from "@/components/store/MobileBottomNav";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Shield, Truck, Heart, Star } from "lucide-react";
+import { motion } from "framer-motion";
+
+const fade = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+const stagger = {
+  show: { transition: { staggerChildren: 0.12 } },
+};
+
+const values = [
+  { icon: Shield, label: "Quality Guarantee", desc: "Genuine & tested parts" },
+  { icon: Truck, label: "Fast Delivery", desc: "Same-day across Nyandarua" },
+  { icon: Heart, label: "Customer First", desc: "Your satisfaction matters" },
+  { icon: Star, label: "Trusted Since Day 1", desc: "Mechanics love us" },
+];
 
 const AboutPage = () => (
   <div className="min-h-screen bg-background pb-16 md:pb-0">
     <StoreHeader />
 
-    {/* Hero Section */}
-    <div className="bg-muted/40 border-b border-border">
-      <div className="container max-w-4xl py-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-          About DMT Spares
-        </h1>
-        <p className="text-muted-foreground max-w-2xl">
-          DMT Spares is your trusted partner for high-quality auto parts,
-          engine oils, and vehicle accessories in Nyandarua County and beyond.
-          We are committed to reliability, affordability, and excellent
-          customer service.
-        </p>
-      </div>
-    </div>
+    {/* Hero */}
+    <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-primary-foreground">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA4KSIvPjwvc3ZnPg==')] opacity-40" />
+      <motion.div
+        initial="hidden" animate="show" variants={stagger}
+        className="container max-w-4xl py-16 md:py-24 relative z-10 text-center"
+      >
+        <motion.h1 variants={fade} className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+          DMT Spares 🚗
+        </motion.h1>
+        <motion.p variants={fade} className="text-lg md:text-xl opacity-90 max-w-xl mx-auto">
+          Olkalou's most trusted auto parts shop — keeping Kenya moving since day one.
+        </motion.p>
+      </motion.div>
+    </section>
 
-    {/* Main Content */}
-    <div className="container max-w-4xl py-10 space-y-10">
+    {/* Values */}
+    <section className="container max-w-4xl -mt-8 relative z-20 px-4">
+      <motion.div
+        initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+        className="grid grid-cols-2 md:grid-cols-4 gap-3"
+      >
+        {values.map((v) => (
+          <motion.div
+            key={v.label} variants={fade}
+            className="bg-card border border-border rounded-xl p-4 text-center shadow-md hover:shadow-lg transition-shadow"
+          >
+            <v.icon className="w-7 h-7 text-primary mx-auto mb-2" />
+            <h3 className="font-bold text-sm text-foreground">{v.label}</h3>
+            <p className="text-xs text-muted-foreground mt-1">{v.desc}</p>
+          </motion.div>
+        ))}
+      </motion.div>
+    </section>
 
-      {/* Who We Are */}
-      <section className="bg-card border border-border rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-foreground mb-3">
-          Who We Are
-        </h2>
-        <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-          Based in Olkalou Town, DMT Spares serves customers across Nyandarua
-          County and surrounding regions. We specialize in supplying genuine
-          and high-quality aftermarket spare parts for a wide range of vehicles.
-        </p>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Whether you are a mechanic, fleet owner, or individual car owner,
-          we provide dependable solutions to keep your vehicle running smoothly.
-        </p>
-      </section>
+    <div className="container max-w-4xl py-12 space-y-10 px-4">
 
-      {/* Mission & Vision */}
-      <section className="grid md:grid-cols-2 gap-6">
-        <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-          <h3 className="font-semibold text-foreground mb-2">
-            Our Mission
-          </h3>
+      {/* Mission */}
+      <motion.section
+        initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+        className="grid md:grid-cols-2 gap-4"
+      >
+        <motion.div variants={fade} className="bg-card border border-border rounded-xl p-6 shadow-sm">
+          <h3 className="font-bold text-foreground mb-2">🎯 Mission</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            To keep Kenya moving by providing affordable, reliable, and
-            high-quality auto parts supported by exceptional customer service.
+            To keep Kenya moving with affordable, reliable, and high-quality auto parts backed by exceptional customer service.
           </p>
-        </div>
-
-        <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-          <h3 className="font-semibold text-foreground mb-2">
-            Our Vision
-          </h3>
+        </motion.div>
+        <motion.div variants={fade} className="bg-card border border-border rounded-xl p-6 shadow-sm">
+          <h3 className="font-bold text-foreground mb-2">🔭 Vision</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            To become a leading and trusted supplier of automotive parts
-            across Kenya, known for quality, integrity, and customer
-            satisfaction.
+            To become Kenya's leading trusted supplier of automotive parts — known for quality, integrity, and customer satisfaction.
           </p>
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
-      {/* Core Values */}
-      <section className="bg-card border border-border rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-foreground mb-4">
-          Our Core Values
-        </h2>
-
-        <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
-          <p>✔ Quality products you can trust</p>
-          <p>✔ Honest and transparent pricing</p>
-          <p>✔ Customer-first approach</p>
-          <p>✔ Reliability and consistency</p>
-        </div>
-      </section>
-
-      {/* Why Choose Us */}
-      <section className="bg-card border border-border rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-foreground mb-4">
-          Why Choose DMT Spares
-        </h2>
-
-        <ul className="space-y-3 text-sm text-muted-foreground">
-          <li>• Wide range of genuine and aftermarket spare parts</li>
-          <li>• Competitive and affordable pricing</li>
-          <li>• Trusted by local mechanics and vehicle owners</li>
-          <li>• Fast, friendly, and reliable customer service</li>
-          <li>• Convenient location in Olkalou Town</li>
-        </ul>
-      </section>
-
-      {/* Call to Action */}
-      <section className="bg-primary text-primary-foreground rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold mb-2">
-          Need Quality Auto Parts?
-        </h2>
-        <p className="text-sm opacity-90 mb-4">
-          Visit our store or contact us today for reliable parts and expert
-          assistance.
-        </p>
-
-        <div className="flex flex-wrap gap-3 text-sm">
-          <span className="bg-white/10 px-3 py-1 rounded-md">
-            Trusted Service
+      {/* CTA */}
+      <motion.section
+        initial="hidden" whileInView="show" viewport={{ once: true }} variants={fade}
+        className="bg-primary text-primary-foreground rounded-2xl p-8 text-center shadow-lg"
+      >
+        <h2 className="text-xl font-bold mb-2">Need Quality Auto Parts?</h2>
+        <p className="text-sm opacity-90 mb-5">Visit us or call — we're always ready to help.</p>
+        <div className="flex flex-wrap justify-center gap-4 text-sm">
+          <span className="flex items-center gap-1.5 bg-white/10 px-4 py-2 rounded-lg">
+            <MapPin className="w-4 h-4" /> Olkalou Town
           </span>
-          <span className="bg-white/10 px-3 py-1 rounded-md">
-            Affordable Prices
+          <span className="flex items-center gap-1.5 bg-white/10 px-4 py-2 rounded-lg">
+            <Phone className="w-4 h-4" /> +254 712 345 678
           </span>
-          <span className="bg-white/10 px-3 py-1 rounded-md">
-            Genuine Parts
+          <span className="flex items-center gap-1.5 bg-white/10 px-4 py-2 rounded-lg">
+            <Clock className="w-4 h-4" /> Mon–Sat 8AM–6PM
           </span>
         </div>
-      </section>
-
-      {/* Contact Section */}
-      <section className="bg-card border border-border rounded-xl p-6 shadow-sm">
-        <h2 className="font-semibold text-foreground mb-4">
-          Contact Us
-        </h2>
-
-        <div className="grid gap-4 text-sm text-muted-foreground md:grid-cols-2">
-          <p className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-primary" />
-            Olkalou Town, Nyandarua County, Kenya
-          </p>
-
-          <p className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-primary" />
-            +254 712 345 678
-          </p>
-
-          <p className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-primary" />
-            info@dmtspares.co.ke
-          </p>
-
-          <p className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-primary" />
-            Mon–Sat: 8:00 AM – 6:00 PM
-          </p>
-        </div>
-      </section>
+      </motion.section>
     </div>
 
     <StoreFooter />
