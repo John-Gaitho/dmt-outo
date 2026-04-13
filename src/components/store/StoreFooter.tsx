@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-const fadeUp = {
+const fadeUp: import("framer-motion").Variants = {
   hidden: { opacity: 0, y: 40 },
   show: (i = 1) => ({
     opacity: 1,
@@ -19,7 +19,7 @@ const fadeUp = {
     transition: {
       delay: i * 0.1,
       duration: 0.6,
-      ease: "easeOut"
+      ease: [0, 0, 0.2, 1] as const
     }
   })
 };
