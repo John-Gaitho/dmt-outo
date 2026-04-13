@@ -1,4 +1,4 @@
-mport { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useStore } from "@/context/StoreContext";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -296,12 +296,12 @@ const DashboardTab = ({ orders, products, lowStockProducts, setActiveTab }: any)
   <div className="bg-warning/5 border border-warning/20 rounded-xl p-3">
     <h3 className="font-semibold text-xs text-foreground mb-2 flex items-center gap-1.5">
       <AlertCircle className="w-3.5 h-3.5 text-warning" /> 
-      Low Stock Alert — {lowStockProducts.length} Products (≤3 units)
+      Low Stock Alert — {lowStockProducts.length} Products (≤7 units)
     </h3>
 
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
       {lowStockProducts
-        .slice(0, 2) // ✅ Limit to only 5 alerts
+        .slice(0, 5) // ✅ Limit to only 5 alerts
         .map((p: Product) => (
           <div
             key={p.id}
