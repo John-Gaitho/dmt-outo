@@ -41,7 +41,7 @@ const WhatWeOffer = () => {
   }, [activeTab, products]);
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: "new", label: "NEW ARRIVALS" },
+    { key: "new", label: "NEW" },
     { key: "featured", label: "FEATURED" },
     { key: "popular", label: "POPULAR" },
   ];
@@ -49,27 +49,23 @@ const WhatWeOffer = () => {
   const showCategories = !isMobile || catOpen;
 
   return (
-    <section className="py-8">
-      <div className="container">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <section className="py-5 md:py-8">
+      <div className="container px-3 md:px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-
-            {/* Categories */}
-            <div className="bg-card border border-border rounded-lg overflow-hidden">
+            <div className="bg-card border border-border rounded-xl md:rounded-lg overflow-hidden">
               <button
                 onClick={() => isMobile && setCatOpen(!catOpen)}
-                className="w-full bg-primary px-4 py-3 flex items-center justify-between"
+                className="w-full bg-primary px-4 py-2.5 md:py-3 flex items-center justify-between"
               >
-                <h3 className="text-sm font-bold text-primary-foreground tracking-wide">
+                <h3 className="text-xs md:text-sm font-bold text-primary-foreground tracking-wide">
                   CATEGORIES
                 </h3>
                 {isMobile && (
                   <ChevronDown
-                    className={`w-4 h-4 text-primary-foreground transition-transform duration-200 ${
-                      catOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 text-primary-foreground transition-transform duration-200 ${catOpen ? "rotate-180" : ""}`}
                   />
                 )}
               </button>
@@ -80,11 +76,11 @@ const WhatWeOffer = () => {
                     <li key={cat.name}>
                       <Link
                         to={`/shop?category=${encodeURIComponent(cat.name)}`}
-                        className="flex items-center justify-between px-4 py-3 text-sm text-foreground hover:bg-muted border-b border-border transition-colors"
+                        className="flex items-center justify-between px-4 py-2.5 md:py-3 text-xs md:text-sm text-foreground hover:bg-muted border-b border-border transition-colors"
                       >
                         <span>{cat.name}</span>
                         <div className="flex items-center gap-2 text-muted-foreground">
-                          <span className="text-xs">{cat.count}</span>
+                          <span className="text-[10px] md:text-xs">{cat.count}</span>
                           <Arrow className="w-3 h-3" />
                         </div>
                       </Link>
@@ -94,82 +90,55 @@ const WhatWeOffer = () => {
               )}
             </div>
 
-            {/* Brands - Hidden on mobile */}
+            {/* Brands - desktop */}
             <div className="hidden lg:block mt-6 bg-card border border-border rounded-lg p-4">
-              <h3 className="text-sm font-bold text-foreground mb-4 tracking-wide">
-                BRANDS
-              </h3>
+              <h3 className="text-sm font-bold text-foreground mb-4 tracking-wide">BRANDS</h3>
               <div className="grid grid-cols-3 gap-3">
                 {brandLogos.map((brand) => (
-                  <Link
-                    key={brand.name}
-                    to={`/shop?q=${encodeURIComponent(brand.name)}`}
-                    className="flex flex-col items-center gap-1 p-2 border border-border rounded hover:border-primary hover:shadow-sm transition-all"
-                  >
-                    <img
-                      src={brand.icon}
-                      alt={brand.name}
-                      className="w-8 h-8 object-contain"
-                      loading="lazy"
-                    />
-                    <span className="text-[10px] font-semibold text-muted-foreground">
-                      {brand.name}
-                    </span>
+                  <Link key={brand.name} to={`/shop?q=${encodeURIComponent(brand.name)}`}
+                    className="flex flex-col items-center gap-1 p-2 border border-border rounded hover:border-primary hover:shadow-sm transition-all">
+                    <img src={brand.icon} alt={brand.name} className="w-8 h-8 object-contain" loading="lazy" />
+                    <span className="text-[10px] font-semibold text-muted-foreground">{brand.name}</span>
                   </Link>
                 ))}
               </div>
             </div>
 
-            {/* 🎥 Video Promo Banner */}
-            <div className="mt-6 relative overflow-hidden rounded-lg border border-border">
-              <video
-  className="w-full h-70 object-cover"
-  src={promoVideo}
-  autoPlay
-  loop
-  muted
-  playsInline
-/>
-
+            {/* Video */}
+            <div className="hidden md:block mt-6 relative overflow-hidden rounded-lg border border-border">
+              <video className="w-full h-70 object-cover" src={promoVideo} autoPlay loop muted playsInline />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-center justify-center">
                 <div className="text-center">
-                  <p className="text-white text-xs font-semibold tracking-wide">
-                    QUALITY PARTS
-                  </p>
-                  <h4 className="text-white font-bold text-sm">
-                    FOR EVERY CAR
-                  </h4>
+                  <p className="text-white text-xs font-semibold tracking-wide">QUALITY PARTS</p>
+                  <h4 className="text-white font-bold text-sm">FOR EVERY CAR</h4>
                 </div>
               </div>
             </div>
-
           </div>
 
           {/* Products */}
           <div className="lg:col-span-3">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
-              <h2 className="text-xl font-bold text-foreground">
+            <div className="flex items-center justify-between mb-3 md:mb-5 gap-2">
+              <h2 className="text-base md:text-xl font-bold text-foreground whitespace-nowrap">
                 WHAT <span className="text-primary">WE OFFER</span>
               </h2>
 
-              <div className="flex items-center gap-1">
-                <div className="flex items-center">
-                  {tabs.map((tab) => (
-                    <button
-                      key={tab.key}
-                      onClick={() => setActiveTab(tab.key)}
-                      className={`px-4 py-2 text-xs font-semibold border-b-2 transition ${
-                        activeTab === tab.key
-                          ? "border-primary text-primary"
-                          : "border-transparent text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center gap-1 overflow-x-auto">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-semibold border-b-2 transition whitespace-nowrap ${
+                      activeTab === tab.key
+                        ? "border-primary text-primary"
+                        : "border-transparent text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
 
-                <div className="flex gap-1 ml-2">
+                <div className="hidden sm:flex gap-1 ml-2">
                   <button className="p-1.5 border border-border rounded hover:bg-muted">
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -180,13 +149,12 @@ const WhatWeOffer = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
               {displayProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           </div>
-
         </div>
       </div>
     </section>
