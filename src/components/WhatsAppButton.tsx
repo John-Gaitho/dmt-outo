@@ -15,11 +15,9 @@ const WhatsAppButton = () => {
       const currentScrollY = window.scrollY;
 
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // scrolling down → hide
-        setVisible(false);
+        setVisible(false); // hide on scroll down
       } else {
-        // scrolling up → show
-        setVisible(true);
+        setVisible(true); // show on scroll up
       }
 
       lastScrollY = currentScrollY;
@@ -33,19 +31,34 @@ const WhatsAppButton = () => {
   return (
     <div
       className={`
-        fixed right-20 z-50 flex flex-col items-end
-        bottom-20 md:bottom-8
+        fixed z-50 flex flex-col items-end
+
+        /* Mobile placement */
+        right-4 bottom-20
+
+        /* Desktop placement */
+        md:right-6 md:bottom-8
+
         transition-all duration-300
-        ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"}
+        ${
+          visible
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-10 pointer-events-none"
+        }
       `}
     >
       {/* Tooltip */}
       <div
-        className={`mb-2 px-3 py-1 text-sm bg-black text-white rounded-lg shadow transition-all duration-300 ${
-          showTooltip
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-2"
-        }`}
+        className={`
+          mb-2 px-3 py-1 text-xs md:text-sm
+          bg-black text-white rounded-lg shadow-lg
+          transition-all duration-300
+          ${
+            showTooltip
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-2"
+          }
+        `}
       >
         Chat with us
       </div>
@@ -57,11 +70,20 @@ const WhatsAppButton = () => {
         rel="noopener noreferrer"
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
+        onTouchStart={() => setShowTooltip(true)}
         onClick={() => setShowTooltip(false)}
         className="
-          bg-green-500 hover:bg-green-600 text-white
-          p-3.5 rounded-full shadow-lg
-          hover:scale-110 transition-transform
+          bg-green-500 hover:bg-green-600
+          active:scale-95
+          text-white
+
+          /* Mobile tap size */
+          p-4 md:p-3.5
+
+          rounded-full
+          shadow-xl
+          hover:scale-110
+          transition-transform duration-200
         "
       >
         <svg
