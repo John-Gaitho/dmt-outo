@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect } from "react";
+mport { useState, useRef, useMemo, useEffect } from "react";
 import { useStore } from "@/context/StoreContext";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -54,7 +54,7 @@ const AdminPage = () => {
     </div>
   );
 
-  const lowStockProducts = products.filter(p => (p.stockQuantity ?? 100) <= 5 && p.inStock);
+  const lowStockProducts = products.filter(p => (p.stockQuantity ?? 100) <= 10 && p.inStock);
   const pendingOrders = orders.filter(o => o.status === "pending").length;
 
   const sidebarItems: { icon: typeof LayoutDashboard; label: string; tab: Tab; badge?: number }[] = [
@@ -292,28 +292,49 @@ const DashboardTab = ({ orders, products, lowStockProducts, setActiveTab }: any)
       </div>
 
       {/* Stock Quantity Alerts */}
-      {lowStockProducts.length > 0 && (
-        <div className="bg-warning/5 border border-warning/20 rounded-xl p-3">
-          <h3 className="font-semibold text-xs text-foreground mb-2 flex items-center gap-1.5">
-            <AlertCircle className="w-3.5 h-3.5 text-warning" /> Low Stock Alert — {lowStockProducts.length} Products (≤5 units)
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {lowStockProducts.map((p: Product) => (
-              <div key={p.id} className="bg-card border border-border rounded-lg p-2 flex items-center gap-2">
-                <img src={p.images?.[0] || p.image} alt={p.name} className="w-9 h-9 rounded object-contain bg-muted p-0.5" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-medium text-foreground truncate">{p.name}</p>
-                  <p className="text-[9px] text-muted-foreground">{p.category}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs font-bold text-warning">{p.stockQuantity ?? 0}</span>
-                  <p className="text-[8px] text-muted-foreground">units</p>
-                </div>
-              </div>
-            ))}
+{lowStockProducts.length > 0 && (
+  <div className="bg-warning/5 border border-warning/20 rounded-xl p-3">
+    <h3 className="font-semibold text-xs text-foreground mb-2 flex items-center gap-1.5">
+      <AlertCircle className="w-3.5 h-3.5 text-warning" /> 
+      Low Stock Alert — {lowStockProducts.length} Products (≤3 units)
+    </h3>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+      {lowStockProducts
+        .slice(0, 2) // ✅ Limit to only 5 alerts
+        .map((p: Product) => (
+          <div
+            key={p.id}
+            className="bg-card border border-border rounded-lg p-2 flex items-center gap-2"
+          >
+            <img
+              src={p.images?.[0] || p.image}
+              alt={p.name}
+              className="w-9 h-9 rounded object-contain bg-muted p-0.5"
+            />
+
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-medium text-foreground truncate">
+                {p.name}
+              </p>
+              <p className="text-[9px] text-muted-foreground">
+                {p.category}
+              </p>
+            </div>
+
+            <div className="text-right">
+              <span className="text-xs font-bold text-warning">
+                {p.stockQuantity ?? 0}
+              </span>
+              <p className="text-[8px] text-muted-foreground">
+                units
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        ))}
+    </div>
+  </div>
+)}
 
       {/* Recent Orders */}
       <div className="bg-card border border-border rounded-xl p-3 overflow-x-auto">
