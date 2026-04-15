@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_sales: {
+        Row: {
+          buying_price: number
+          category: string
+          created_at: string
+          customer_name: string | null
+          id: string
+          invoice_number: string
+          notes: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          product_id: string | null
+          product_name: string
+          profit: number
+          quantity: number
+          sale_date: string
+          selling_price: number
+          total_amount: number
+        }
+        Insert: {
+          buying_price?: number
+          category?: string
+          created_at?: string
+          customer_name?: string | null
+          id?: string
+          invoice_number: string
+          notes?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          product_id?: string | null
+          product_name: string
+          profit?: number
+          quantity?: number
+          sale_date?: string
+          selling_price?: number
+          total_amount?: number
+        }
+        Update: {
+          buying_price?: number
+          category?: string
+          created_at?: string
+          customer_name?: string | null
+          id?: string
+          invoice_number?: string
+          notes?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          product_id?: string | null
+          product_name?: string
+          profit?: number
+          quantity?: number
+          sale_date?: string
+          selling_price?: number
+          total_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_sales_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string
@@ -107,6 +169,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      payment_method: "Cash" | "M-Pesa" | "Bank" | "Credit"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -235,6 +298,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      payment_method: ["Cash", "M-Pesa", "Bank", "Credit"],
     },
   },
 } as const
