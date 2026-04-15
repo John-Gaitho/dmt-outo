@@ -558,7 +558,7 @@ z-50
 
 <Link
 key={cat}
-to={`/shop?category=${cat.toLowerCase()}`}
+to={`/shop?category=${encodeURIComponent(cat)}`}
 className="p-3 rounded-xl hover:bg-orange-50 font-medium"
 >
 
