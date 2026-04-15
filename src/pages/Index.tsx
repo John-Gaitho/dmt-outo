@@ -21,11 +21,11 @@ const Index = () => (
       title="Headlights & Lighting"
       category="Headlights & Lighting"
       subcategories={[
-        { name: "Bulbs", link: "/category/headlights/bulbs" },
-        { name: "Car Reflectors", link: "/category/headlights/reflectors" },
-        { name: "Corner Lights", link: "/category/headlights/corner-lights" },
-        { name: "Running Lights", link: "/category/headlights/running-lights" },
-        { name: "Door Light", link: "/category/headlights/door-light" },
+        { name: "Bulbs", link: "/shop?category=Headlights%20%26%20Lighting&q=bulbs" },
+        { name: "Car Reflectors", link: "/shop?category=Headlights%20%26%20Lighting&q=reflectors" },
+        { name: "Corner Lights", link: "/shop?category=Headlights%20%26%20Lighting&q=corner%20lights" },
+        { name: "Running Lights", link: "/shop?category=Headlights%20%26%20Lighting&q=running%20lights" },
+        { name: "Door Light", link: "/shop?category=Headlights%20%26%20Lighting&q=door%20light" },
       ]}
     />
 
@@ -33,11 +33,11 @@ const Index = () => (
       title="Brakes & Rotors"
       category="Brakes & Rotors"
       subcategories={[
-        { name: "ABS", link: "/category/brakes/abs" },
-        { name: "Accessories", link: "/category/brakes/accessories" },
-        { name: "Brake Booster", link: "/category/brakes/booster" },
-        { name: "Brake Calipers", link: "/category/brakes/calipers" },
-        { name: "Brake Cylinder", link: "/category/brakes/cylinder" },
+        { name: "ABS", link: "/shop?category=Brakes%20%26%20Rotors&q=abs" },
+        { name: "Accessories", link: "/shop?category=Brakes%20%26%20Rotors&q=accessories" },
+        { name: "Brake Booster", link: "/shop?category=Brakes%20%26%20Rotors&q=booster" },
+        { name: "Brake Calipers", link: "/shop?category=Brakes%20%26%20Rotors&q=calipers" },
+        { name: "Brake Cylinder", link: "/shop?category=Brakes%20%26%20Rotors&q=cylinder" },
       ]}
     />
 
@@ -45,11 +45,11 @@ const Index = () => (
       title="Engines & Components"
       category="Engines & Components"
       subcategories={[
-        { name: "Engine Oil", link: "/category/engine/oil" },
-        { name: "Filters", link: "/category/engine/filters" },
-        { name: "Gaskets", link: "/category/engine/gaskets" },
-        { name: "Pistons", link: "/category/engine/pistons" },
-        { name: "Timing Belts", link: "/category/engine/timing-belts" },
+        { name: "Engine Oil", link: "/shop?category=Engines%20%26%20Components&q=oil" },
+        { name: "Filters", link: "/shop?category=Engines%20%26%20Components&q=filters" },
+        { name: "Gaskets", link: "/shop?category=Engines%20%26%20Components&q=gaskets" },
+        { name: "Pistons", link: "/shop?category=Engines%20%26%20Components&q=pistons" },
+        { name: "Timing Belts", link: "/shop?category=Engines%20%26%20Components&q=timing%20belts" },
       ]}
     />
 
