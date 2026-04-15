@@ -640,7 +640,7 @@ Categories
 
 <Link
 key={cat}
-to={`/shop?category=${cat.toLowerCase()}`}
+to={`/shop?category=${encodeURIComponent(cat)}`}
 onClick={() =>
 setMenuOpen(false)
 }
