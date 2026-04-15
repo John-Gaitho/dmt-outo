@@ -172,12 +172,14 @@ const StoreHeader = () => {
   /* Categories */
 
   const categories = [
-    "Engine Parts",
-    "Brake Parts",
-    "Suspension",
-    "Filters",
+    "Air & Fuel Delivery",
+    "Exterior & Accessories",
+    "Headlights & Lighting",
+    "Brakes & Rotors",
+    "Engines & Components",
     "Electrical",
-    "Body Parts",
+    "Interior",
+    "Suspension",
   ];
 
   return (
