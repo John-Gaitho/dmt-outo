@@ -8,7 +8,7 @@ import {
   Plus, Edit, Trash2, ChevronDown, TrendingUp, DollarSign, Eye, Upload, X, Image,
   FileDown, BarChart3, Activity, Calendar, CheckCircle, Clock, XCircle, AlertTriangle,
   Sun, Moon, AlertCircle, PackageX, Boxes, Search, RefreshCw, ArrowUpRight,
-  ArrowDownRight, Percent, Target, Zap, Bell, Truck, CreditCard, Star, Hash, ShoppingBag
+  ArrowDownRight, Percent, Target, Zap, Bell, Truck, CreditCard, Star, Hash, ShoppingBag, Receipt
 } from "lucide-react";
 import { Product, Order } from "@/data/store";
 import { toast } from "sonner";
