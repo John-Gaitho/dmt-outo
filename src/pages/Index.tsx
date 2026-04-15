@@ -17,6 +17,7 @@ const Index = () => (
     <PremiumBanner />
     <DealsSection />
 
+    {/* HEADLIGHTS */}
     <ProductSection
       title="Headlights & Lighting"
       category="Headlights & Lighting"
@@ -29,6 +30,7 @@ const Index = () => (
       ]}
     />
 
+    {/* BRAKES */}
     <ProductSection
       title="Brakes & Rotors"
       category="Brakes & Rotors"
@@ -41,6 +43,7 @@ const Index = () => (
       ]}
     />
 
+    {/* ENGINE */}
     <ProductSection
       title="Engines & Components"
       category="Engines & Components"
@@ -50,6 +53,45 @@ const Index = () => (
         { name: "Gaskets", link: "/shop?category=Engines%20%26%20Components&q=gaskets" },
         { name: "Pistons", link: "/shop?category=Engines%20%26%20Components&q=pistons" },
         { name: "Timing Belts", link: "/shop?category=Engines%20%26%20Components&q=timing%20belts" },
+      ]}
+    />
+
+    {/* NEW — AIR & FUEL DELIVERY */}
+    <ProductSection
+      title="Air & Fuel Delivery"
+      category="Air & Fuel Delivery"
+      subcategories={[
+        { name: "Fuel Pumps", link: "/shop?category=Air%20%26%20Fuel%20Delivery&q=fuel%20pump" },
+        { name: "Fuel Injectors", link: "/shop?category=Air%20%26%20Fuel%20Delivery&q=injector" },
+        { name: "Air Filters", link: "/shop?category=Air%20%26%20Fuel%20Delivery&q=air%20filter" },
+        { name: "Throttle Bodies", link: "/shop?category=Air%20%26%20Fuel%20Delivery&q=throttle" },
+        { name: "Mass Air Flow", link: "/shop?category=Air%20%26%20Fuel%20Delivery&q=maf" },
+      ]}
+    />
+
+    {/* NEW — ELECTRICAL */}
+    <ProductSection
+      title="Electrical"
+      category="Electrical"
+      subcategories={[
+        { name: "Batteries", link: "/shop?category=Electrical&q=battery" },
+        { name: "Alternators", link: "/shop?category=Electrical&q=alternator" },
+        { name: "Starters", link: "/shop?category=Electrical&q=starter" },
+        { name: "Ignition Coils", link: "/shop?category=Electrical&q=coil" },
+        { name: "Sensors", link: "/shop?category=Electrical&q=sensor" },
+      ]}
+    />
+
+    {/* NEW — SUSPENSION */}
+    <ProductSection
+      title="Suspension"
+      category="Suspension"
+      subcategories={[
+        { name: "Shock Absorbers", link: "/shop?category=Suspension&q=shock" },
+        { name: "Struts", link: "/shop?category=Suspension&q=struts" },
+        { name: "Control Arms", link: "/shop?category=Suspension&q=control%20arm" },
+        { name: "Ball Joints", link: "/shop?category=Suspension&q=ball%20joint" },
+        { name: "Bushings", link: "/shop?category=Suspension&q=bushing" },
       ]}
     />
 

@@ -55,7 +55,7 @@ const AdminPage = () => {
     </div>
   );
 
-  const lowStockProducts = products.filter(p => (p.stockQuantity ?? 100) <= 10 && p.inStock);
+  const lowStockProducts = products.filter(p => (p.stockQuantity ?? 100) <= 5 && p.inStock);
   const pendingOrders = orders.filter(o => o.status === "pending").length;
 
   const sidebarItems: { icon: typeof LayoutDashboard; label: string; tab: Tab; badge?: number }[] = [
@@ -299,7 +299,7 @@ const DashboardTab = ({ orders, products, lowStockProducts, setActiveTab }: any)
   <div className="bg-warning/5 border border-warning/20 rounded-xl p-3">
     <h3 className="font-semibold text-xs text-foreground mb-2 flex items-center gap-1.5">
       <AlertCircle className="w-3.5 h-3.5 text-warning" /> 
-      Low Stock Alert — {lowStockProducts.length} Products (≤7 units)
+      Low Stock Alert — {lowStockProducts.length} Products (≤5 units)
     </h3>
 
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">

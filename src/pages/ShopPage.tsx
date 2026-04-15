@@ -22,7 +22,7 @@ import bannerSuspension from "@/assets/product-suspension.png";
 
 /* ================= CONFIG ================= */
 
-const PRODUCTS_PER_PAGE = 12;
+const PRODUCTS_PER_PAGE = 24;
 
 /* ================= SHUFFLE ================= */
 
