@@ -16,12 +16,13 @@ import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import DailySalesTab from "@/components/admin/DailySalesTab";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart as RechartsPie, Pie, Cell, AreaChart, Area
 } from "recharts";
 
-type Tab = "dashboard" | "products" | "orders" | "customers" | "reports" | "settings";
+type Tab = "dashboard" | "products" | "orders" | "customers" | "reports" | "settings" | "daily-sales";
 
 const CHART_COLORS = ["#f97316", "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#06b6d4", "#f59e0b", "#ec4899"];
 
@@ -62,6 +63,7 @@ const AdminPage = () => {
     { icon: Package, label: "Products", tab: "products", badge: lowStockProducts.length || undefined },
     { icon: ShoppingCart, label: "Orders", tab: "orders", badge: pendingOrders || undefined },
     { icon: Users, label: "Customers", tab: "customers" },
+    { icon: Receipt, label: "Daily Sales", tab: "daily-sales" },
     { icon: BarChart3, label: "Reports", tab: "reports" },
     { icon: Settings, label: "Settings", tab: "settings" },
   ];
@@ -171,6 +173,7 @@ const AdminPage = () => {
           )}
           {activeTab === "orders" && <OrdersTab orders={orders} onUpdateStatus={updateOrderStatus} onDeleteOrder={deleteOrder} />}
           {activeTab === "customers" && <CustomersTab orders={orders} onDeleteCustomer={(email: string) => setOrders(prev => prev.filter(o => o.email !== email))} />}
+          {activeTab === "daily-sales" && <DailySalesTab />}
           {activeTab === "reports" && <ReportsTab orders={orders} products={products} />}
           {activeTab === "settings" && <SettingsTab onSignOut={signOut} />}
         </div>
