@@ -110,7 +110,6 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
   const { updateProduct } = useStore();
 
   const [form, setForm] = useState({ ...product });
-
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [newImage, setNewImage] = useState("");
@@ -167,24 +166,15 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
   /* VALIDATION */
 
   const validate = () => {
-    if (!form.name.trim())
-      return "Name is required";
-
-    if (form.price <= 0)
-      return "Price must be greater than 0";
-
-    if (!form.category.trim())
-      return "Category is required";
-
-    if (form.stockQuantity < 0)
-      return "Stock cannot be negative";
-
+    if (!form.name.trim()) return "Name is required";
+    if (form.price <= 0) return "Price must be greater than 0";
+    if (!form.category.trim()) return "Category is required";
+    if (form.stockQuantity < 0) return "Stock cannot be negative";
     return null;
   };
 
   const handleSave = async () => {
     const err = validate();
-
     if (err) return toast.error(err);
 
     setSaving(true);
@@ -222,12 +212,6 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
     );
   };
 
-  const labelCls =
-    "text-xs font-medium text-muted-foreground mb-1 block";
-
-  const inputCls =
-    "w-full border border-border rounded-md px-3 py-2 text-sm bg-background text-foreground focus:ring-2 focus:ring-primary focus:outline-none";
-
   /* FILTERED SUBCATEGORIES */
 
   const filteredSubcategories =
@@ -244,6 +228,12 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
         )
       : [];
 
+  const labelCls =
+    "text-xs font-medium text-muted-foreground mb-1 block";
+
+  const inputCls =
+    "w-full border border-border rounded-md px-3 py-2 text-sm bg-background text-foreground focus:ring-2 focus:ring-primary focus:outline-none";
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -253,12 +243,11 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
         className="bg-card border border-border rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
+
         {/* HEADER */}
 
-        <div className="flex items-center justify-between p-4 border-b border-border sticky top-0 bg-card z-10">
-          <h2 className="text-lg font-bold">
-            Edit Product
-          </h2>
+        <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-card z-10">
+          <h2 className="text-lg font-bold">Edit Product</h2>
 
           <button
             onClick={onClose}
@@ -273,9 +262,7 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
           {/* NAME */}
 
           <div>
-            <label className={labelCls}>
-              Product Name *
-            </label>
+            <label className={labelCls}>Product Name *</label>
 
             <input
               className={inputCls}
@@ -289,6 +276,7 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
           {/* PRICE */}
 
           <div className="grid grid-cols-2 gap-3">
+
             <div>
               <label className={labelCls}>
                 Price (KSH) *
@@ -312,9 +300,7 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
               <input
                 type="number"
                 className={inputCls}
-                value={
-                  form.originalPrice || ""
-                }
+                value={form.originalPrice || ""}
                 onChange={(e) =>
                   set(
                     "originalPrice",
@@ -325,15 +311,15 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
                 }
               />
             </div>
+
           </div>
 
           {/* CATEGORY + SUBCATEGORY */}
 
           <div className="grid grid-cols-2 gap-3">
 
-            {/* CATEGORY */}
-
             <div>
+
               <label className={labelCls}>
                 Category *
               </label>
@@ -342,10 +328,7 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
                 className={inputCls}
                 value={form.category}
                 onChange={(e) => {
-                  set(
-                    "category",
-                    e.target.value
-                  );
+                  set("category", e.target.value);
                   set("subcategory", "");
                 }}
               >
@@ -353,22 +336,20 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
                   Select category
                 </option>
 
-                {categoryOptions.map(
-                  (cat) => (
-                    <option
-                      key={cat}
-                      value={cat}
-                    >
-                      {cat}
-                    </option>
-                  )
-                )}
+                {categoryOptions.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+
               </select>
+
             </div>
 
-            {/* SUBCATEGORY WITH DROPDOWN */}
+            {/* SUBCATEGORY */}
 
             <div className="relative">
+
               <label className={labelCls}>
                 Subcategory
               </label>
@@ -376,41 +357,40 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
               <input
                 className={inputCls}
                 placeholder="Type or select..."
-                value={
-                  form.subcategory || ""
-                }
+                value={form.subcategory || ""}
                 onChange={(e) =>
                   set(
                     "subcategory",
-                    e.target.value ||
-                      undefined
+                    e.target.value || undefined
                   )
                 }
               />
 
-              {filteredSubcategories.length >
-                0 && (
-                <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-md shadow-md max-h-40 overflow-y-auto">
-                  {filteredSubcategories.map(
-                    (sub) => (
-                      <button
-                        key={sub}
-                        type="button"
-                        onClick={() =>
-                          set(
-                            "subcategory",
-                            sub
-                          )
-                        }
-                        className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition"
-                      >
-                        {sub}
-                      </button>
-                    )
-                  )}
+              {filteredSubcategories.length > 0 && (
+
+                <div className="absolute z-20 w-full mt-1 bg-card border rounded-md shadow-md max-h-40 overflow-y-auto">
+
+                  {filteredSubcategories.map((sub) => (
+
+                    <button
+                      key={sub}
+                      type="button"
+                      onClick={() =>
+                        set("subcategory", sub)
+                      }
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition"
+                    >
+                      {sub}
+                    </button>
+
+                  ))}
+
                 </div>
+
               )}
+
             </div>
+
           </div>
 
           {/* STOCK / DISCOUNT / RATING */}
@@ -443,9 +423,7 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
               <input
                 type="number"
                 className={inputCls}
-                value={
-                  form.discount || ""
-                }
+                value={form.discount || ""}
                 onChange={(e) =>
                   set(
                     "discount",
@@ -470,36 +448,156 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
                 className={inputCls}
                 value={form.rating}
                 onChange={(e) =>
-                  set(
-                    "rating",
-                    +e.target.value
-                  )
+                  set("rating", +e.target.value)
                 }
               />
             </div>
 
           </div>
 
+          {/* TOGGLES */}
+
+          <div className="flex gap-4 flex-wrap pt-2">
+
+            {[
+              { key: "inStock", label: "In Stock" },
+              { key: "featured", label: "Featured" },
+              { key: "deal", label: "Deal" },
+            ].map(({ key, label }) => (
+
+              <label
+                key={key}
+                className="flex items-center gap-2 text-sm cursor-pointer px-3 py-1 rounded-md border hover:bg-muted transition"
+              >
+
+                <input
+                  type="checkbox"
+                  checked={!!(form as any)[key]}
+                  onChange={(e) =>
+                    set(key, e.target.checked)
+                  }
+                  className="accent-primary w-4 h-4"
+                />
+
+                {label}
+
+              </label>
+
+            ))}
+
+          </div>
+
           {/* DESCRIPTION */}
 
           <div>
+
             <label className={labelCls}>
               Description
             </label>
 
             <textarea
               className={`${inputCls} min-h-[80px]`}
-              value={
-                form.description || ""
-              }
+              value={form.description || ""}
               onChange={(e) =>
                 set(
                   "description",
-                  e.target.value ||
-                    undefined
+                  e.target.value || undefined
                 )
               }
             />
+
+          </div>
+
+          {/* IMAGES */}
+
+          <div>
+
+            <label className={labelCls}>
+              Images
+            </label>
+
+            <div className="flex flex-wrap gap-2 mb-2">
+
+              {(form.images || []).map(
+                (img: string, i: number) => (
+
+                  <div
+                    key={i}
+                    className="relative w-16 h-16 rounded border overflow-hidden group"
+                  >
+
+                    <img
+                      src={img}
+                      className="w-full h-full object-cover"
+                    />
+
+                    <button
+                      onClick={() => removeImage(i)}
+                      className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center"
+                    >
+                      <Trash2 className="w-4 h-4 text-white" />
+                    </button>
+
+                  </div>
+
+                )
+              )}
+
+            </div>
+
+            <div className="flex gap-2">
+
+              <input
+                className={`${inputCls} flex-1`}
+                placeholder="Image URL..."
+                value={newImage}
+                onChange={(e) =>
+                  setNewImage(e.target.value)
+                }
+              />
+
+              <button
+                onClick={addImage}
+                className="px-3 py-2 bg-primary text-white rounded-md"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+
+            </div>
+
+            <div className="mt-2">
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+
+              <button
+                onClick={() =>
+                  fileInputRef.current?.click()
+                }
+                disabled={uploading}
+                className="px-4 py-2 text-sm border border-dashed border-primary rounded-md flex items-center gap-2"
+              >
+
+                {uploading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Upload className="w-4 h-4" />
+                )}
+
+                {uploading
+                  ? "Uploading..."
+                  : "Upload"}
+
+              </button>
+
+            </div>
+
           </div>
 
         </div>
@@ -521,9 +619,7 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
             className="px-4 py-2 bg-primary text-white rounded-md"
           >
             <Save className="w-4 h-4 inline mr-1" />
-            {saving
-              ? "Saving..."
-              : "Save Changes"}
+            {saving ? "Saving..." : "Save Changes"}
           </button>
 
         </div>
