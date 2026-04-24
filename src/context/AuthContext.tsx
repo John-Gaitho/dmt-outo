@@ -1,87 +1,348 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { User, Session } from "@supabase/supabase-js";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
-interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  isAdmin: boolean;
-  isLoading: boolean;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<void>;
+import axios from "axios";
+
+/* ----------------------------- */
+/* API INSTANCE */
+/* ----------------------------- */
+
+export const api = axios.create({
+  baseURL: "http://localhost:8000",
+});
+
+/* Attach token automatically */
+api.interceptors.request.use((config) => {
+
+  const token =
+    localStorage.getItem("access_token");
+
+  if (token) {
+
+    config.headers.Authorization =
+      `Bearer ${token}`;
+
+  }
+
+  return config;
+
+});
+
+/* ----------------------------- */
+/* TYPES */
+/* ----------------------------- */
+
+interface AuthUser {
+
+  id: string;
+
+  email: string;
+
+  // ⭐ FIXED — matches backend
+  is_admin?: boolean;
+
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+interface AuthContextType {
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  user: AuthUser | null;
 
-  const checkAdmin = async (userId: string) => {
-    const { data } = await supabase.rpc("has_role", {
-      _user_id: userId,
-      _role: "admin",
-    });
-    setIsAdmin(!!data);
-  };
+  isAdmin: boolean;
+
+  isLoading: boolean;
+
+  signUp: (
+    email: string,
+    password: string
+  ) => Promise<{ error?: any }>;
+
+  signIn: (
+    email: string,
+    password: string
+  ) => Promise<{ error?: any }>;
+
+  signOut: () => void;
+
+  refreshUser: () => Promise<void>;
+
+}
+
+/* ----------------------------- */
+
+const AuthContext =
+  createContext<AuthContextType | undefined>(
+    undefined
+  );
+
+/* ----------------------------- */
+/* PROVIDER */
+/* ----------------------------- */
+
+export const AuthProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+
+  const [user, setUser] =
+    useState<AuthUser | null>(null);
+
+  const [isAdmin, setIsAdmin] =
+    useState(false);
+
+  const [isLoading, setIsLoading] =
+    useState(true);
+
+  /* ----------------------------- */
+  /* LOAD USER ON APP START */
+  /* ----------------------------- */
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          setTimeout(() => checkAdmin(session.user.id), 0);
-        } else {
-          setIsAdmin(false);
-        }
-        setIsLoading(false);
-      }
-    );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkAdmin(session.user.id);
-      }
+    const token =
+      localStorage.getItem(
+        "access_token"
+      );
+
+    if (!token) {
+
       setIsLoading(false);
-    });
 
-    return () => subscription.unsubscribe();
+      return;
+
+    }
+
+    loadCurrentUser();
+
   }, []);
 
-  const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: window.location.origin },
-    });
-    return { error };
+  /* ----------------------------- */
+  /* LOAD CURRENT USER */
+  /* ----------------------------- */
+
+  const loadCurrentUser =
+    async () => {
+
+      try {
+
+        const res =
+          await api.get(
+            "/auth/me"
+          );
+
+        const data =
+          res.data;
+
+        console.log(
+          "USER DATA:",
+          data
+        );
+
+        setUser(data);
+
+        /* ⭐ REAL FIX HERE */
+
+        const adminStatus =
+          data?.is_admin === true;
+
+        setIsAdmin(adminStatus);
+
+        console.log(
+          "ADMIN STATUS:",
+          adminStatus
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Auth load failed:",
+          error
+        );
+
+        localStorage.removeItem(
+          "access_token"
+        );
+
+        setUser(null);
+
+        setIsAdmin(false);
+
+      } finally {
+
+        setIsLoading(false);
+
+      }
+
+    };
+
+  /* ----------------------------- */
+  /* SIGN UP */
+  /* ----------------------------- */
+
+  const signUp = async (
+    email: string,
+    password: string
+  ) => {
+
+    try {
+
+      await api.post(
+        "/auth/register",
+        {
+          email,
+          password,
+        }
+      );
+
+      return {};
+
+    } catch (error: any) {
+
+      return {
+
+        error:
+          error?.response?.data ||
+          "Signup failed",
+
+      };
+
+    }
+
   };
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error };
+  /* ----------------------------- */
+  /* SIGN IN */
+  /* ----------------------------- */
+
+  const signIn = async (
+    email: string,
+    password: string
+  ) => {
+
+    try {
+
+      const res =
+        await api.post(
+          "/auth/login",
+          {
+            email,
+            password,
+          }
+        );
+
+      const data =
+        res.data;
+
+      /* Save token */
+
+      localStorage.setItem(
+        "access_token",
+        data.access_token
+      );
+
+      /* Load user */
+
+      await loadCurrentUser();
+
+      return {};
+
+    } catch (error: any) {
+
+      return {
+
+        error:
+          error?.response?.data ||
+          "Login failed",
+
+      };
+
+    }
+
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  /* ----------------------------- */
+  /* SIGN OUT */
+  /* ----------------------------- */
+
+  const signOut = () => {
+
+    localStorage.removeItem(
+      "access_token"
+    );
+
+    setUser(null);
+
     setIsAdmin(false);
+
   };
+
+  /* ----------------------------- */
+  /* REFRESH USER */
+  /* ----------------------------- */
+
+  const refreshUser =
+    async () => {
+
+      setIsLoading(true);
+
+      await loadCurrentUser();
+
+    };
+
+  /* ----------------------------- */
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, isLoading, signUp, signIn, signOut }}>
+
+    <AuthContext.Provider
+      value={{
+
+        user,
+
+        isAdmin,
+
+        isLoading,
+
+        signUp,
+
+        signIn,
+
+        signOut,
+
+        refreshUser,
+
+      }}
+    >
+
       {children}
+
     </AuthContext.Provider>
+
   );
+
 };
 
+/* ----------------------------- */
+/* HOOK */
+/* ----------------------------- */
+
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
+
+  const context =
+    useContext(AuthContext);
+
+  if (!context) {
+
+    throw new Error(
+      "useAuth must be used within AuthProvider"
+    );
+
+  }
+
   return context;
+
 };

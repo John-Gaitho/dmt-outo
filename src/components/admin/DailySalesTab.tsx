@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useStore } from "@/context/StoreContext";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 import {
   Plus, Trash2, Search, FileDown, Calendar, DollarSign, TrendingUp,
   ShoppingBag, CreditCard, X, Receipt

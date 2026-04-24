@@ -11,8 +11,8 @@ import {
   ArrowDownRight, Percent, Target, Zap, Bell, Truck, CreditCard, Star, Hash, ShoppingBag, Receipt
 } from "lucide-react";
 import { Product, Order } from "@/data/store";
+import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";

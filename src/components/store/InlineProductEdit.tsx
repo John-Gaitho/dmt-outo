@@ -2,8 +2,8 @@ import { useState, useRef } from "react";
 import { Product } from "@/data/store";
 import { X, Save, Plus, Trash2, Upload, Loader2 } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import api from "@/lib/api";
 
 interface Props {
   product: Product;
