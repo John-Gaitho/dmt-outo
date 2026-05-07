@@ -3,6 +3,7 @@ import { useStore } from "@/context/StoreContext";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { Link, Navigate } from "react-router-dom";
+
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut,
   Plus, Edit, Trash2, ChevronDown, TrendingUp, DollarSign, Eye, Upload, X, Image,
@@ -10,17 +11,21 @@ import {
   Sun, Moon, AlertCircle, PackageX, Boxes, Search, RefreshCw, ArrowUpRight,
   ArrowDownRight, Percent, Target, Zap, Bell, Truck, CreditCard, Star, Hash, ShoppingBag, Receipt
 } from "lucide-react";
-import { Product, Order } from "@/data/store";
-import { api } from "@/lib/api";
-import { toast } from "sonner";
-import logo from "@/assets/logo.png";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import DailySalesTab from "@/components/admin/DailySalesTab";
+import logo from "../assets/logo.png";
+
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart as RechartsPie, Pie, Cell, AreaChart, Area
 } from "recharts";
+import { toast } from "react-hot-toast";
+import { Product, Order } from "@/types";
+import DailySalesTab from "@/components/admin/DailySalesTab";
+import CustomersTab from "@/components/admin/CustomersTab";
+import OrdersTab from "@/components/admin/OrdersTab";
+import ProductsTab from "@/components/admin/ProductsTab";
+import ReportsTab from "@/components/admin/ReportsTab";
+
+
 
 type Tab = "dashboard" | "products" | "orders" | "customers" | "reports" | "settings" | "daily-sales";
 
@@ -28,7 +33,7 @@ const CHART_COLORS = ["#f97316", "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#0
 
 const AdminPage = () => {
   const { products, orders: storeOrders, addProduct, updateProduct, deleteProduct, updateOrderStatus } = useStore();
-  const [orders, setOrders] = useState<Order[]>(storeOrders);
+  const [orders, setOrders] = useState<Order[]>([]);
   
   useEffect(() => { setOrders(storeOrders); }, [storeOrders]);
   
@@ -354,10 +359,12 @@ const DashboardTab = ({ orders, products, lowStockProducts, setActiveTab }: any)
               {orders.slice(0, 5).map((order: Order) => (
                 <tr key={order.id} className="border-b border-border/50 hover:bg-muted/50">
                   <td className="py-2 font-medium text-foreground">{order.id}</td>
-                  <td className="py-2 text-muted-foreground">{order.customer}</td>
-                  <td className="py-2 font-medium text-foreground">KSH {order.total.toLocaleString()}</td>
+                  <td className="py-2 text-muted-foreground">{order.customer_name || "Walk-in Customer"}</td>
+                  <td className="py-2 font-medium text-foreground">KSH {(Number(order.total_amount) || 0).toLocaleString()}</td>
                   <td className="py-2"><StatusBadge status={order.status} /></td>
-                  <td className="py-2 text-muted-foreground text-[10px]">{order.date}</td>
+                  <td className="py-2 text-muted-foreground text-[10px]">{order.created_at
+    ? new Date(order.created_at).toLocaleDateString()
+    : "-"}</td>
                 </tr>
               ))}
             </tbody>
@@ -463,25 +470,48 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
   };
 
   const handleSave = async () => {
-    if (!formData.name) { toast.error("Product name is required"); return; }
-    if (!formData.price || formData.price <= 0) { toast.error("Valid price is required"); return; }
-    if (!formData.category) { toast.error("Category is required"); return; }
+  if (!formData.name) {
+    toast.error("Product name is required");
+    return;
+  }
 
-    setUploading(true);
-    let uploadedUrls: string[] = imagePreviews.filter(p => p.startsWith("http"));
-    for (const file of imageFiles) {
-      const fileName = `${Date.now()}-${file.name}`;
-      const { data, error } = await supabase.storage.from("product-images").upload(fileName, file);
-      if (error) { toast.error(`Upload failed: ${file.name}`); continue; }
-      const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(data.path);
-      uploadedUrls.push(publicUrl);
-    }
-    onSave({ ...formData, image: uploadedUrls[0] || formData.image || "", images: uploadedUrls });
-    setUploading(false);
+  if (!formData.price || formData.price <= 0) {
+    toast.error("Valid price is required");
+    return;
+  }
+
+  if (!formData.category) {
+    toast.error("Category is required");
+    return;
+  }
+
+  setUploading(true);
+
+  try {
+    
+
+    const uploadedUrls: string[] =
+      imagePreviews.length > 0
+        ? imagePreviews
+        : formData.images || [];
+
+    await onSave({
+      ...formData,
+      image: uploadedUrls[0] || formData.image || "",
+      images: uploadedUrls,
+    });
+
+    toast.success("Product saved successfully");
+
     setImageFiles([]);
     setImagePreviews([]);
-  };
-
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to save product");
+  } finally {
+    setUploading(false);
+  }
+};
   const categoryOptions = ["Air & Fuel Delivery", "Exterior & Accessories", "Headlights & Lighting", "Brakes & Rotors", "Engines & Components", "Electrical", "Interior", "Suspension", "Oils & Fluids", "Filters"];
 
   const displayProducts = useMemo(() => {
@@ -713,111 +743,304 @@ const OrdersTab = ({ orders, onUpdateStatus, onDeleteOrder }: any) => {
         ))}
       </div>
 
-      {/* Orders Table */}
-      <div className="bg-card border border-border rounded-xl overflow-x-auto">
-        <table className="w-full text-xs min-w-[550px]">
-          <thead><tr className="border-b border-border bg-muted/50 text-left text-[10px] text-muted-foreground">
-            <th className="p-2.5 font-medium">Order</th><th className="p-2.5 font-medium">Customer</th><th className="p-2.5 font-medium">Items</th><th className="p-2.5 font-medium">Total</th><th className="p-2.5 font-medium">Status</th><th className="p-2.5 font-medium">Date</th><th className="p-2.5 font-medium">Actions</th>
-          </tr></thead>
-          <tbody>
-            {filtered.map((order: Order) => (
-              <tr key={order.id} className="border-b border-border/50 hover:bg-muted/50">
-                <td className="p-2.5 font-medium text-foreground">{order.id}</td>
-                <td className="p-2.5">
-                  <p className="text-foreground font-medium">{order.customer}</p>
-                  <p className="text-[9px] text-muted-foreground">{order.email}</p>
-                </td>
-                <td className="p-2.5">
-                  {order.items.slice(0, 2).map((item: any, i: number) => (
-                    <p key={i} className="text-[9px] text-muted-foreground truncate max-w-[150px]">{item.product.name} × {item.quantity}</p>
-                  ))}
-                  {order.items.length > 2 && <p className="text-[9px] text-primary">+{order.items.length - 2} more</p>}
-                </td>
-                <td className="p-2.5 font-medium text-foreground">KSH {order.total.toLocaleString()}</td>
-                <td className="p-2.5"><StatusBadge status={order.status} /></td>
-                <td className="p-2.5 text-muted-foreground text-[10px]">{order.date}</td>
-                <td className="p-2.5 flex items-center gap-1">
-                  <select value={order.status}
-                    onChange={e => { onUpdateStatus(order.id, e.target.value); toast.success(`Order ${order.id} → ${e.target.value}`); }}
-                    className="border border-border rounded px-1.5 py-1 text-[10px] bg-background text-foreground">
-                    <option value="pending">Pending</option><option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option>
-                  </select>
-                  <button onClick={() => { if (confirm(`Delete order ${order.id}?`)) { onDeleteOrder(order.id); toast.success("Order deleted"); } }}
-                    className="p-1 border border-border rounded hover:bg-destructive/10 text-destructive" title="Delete">
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {filtered.length === 0 && <div className="p-6 text-center text-muted-foreground text-xs">No orders found</div>}
-      </div>
+{/* Orders Table */}
+<div className="bg-card border border-border rounded-xl overflow-x-auto">
+  <table className="w-full text-xs min-w-[550px]">
+    <thead>
+      <tr className="border-b border-border bg-muted/50 text-left text-[10px] text-muted-foreground">
+        <th className="p-2.5 font-medium">Order</th>
+        <th className="p-2.5 font-medium">Customer</th>
+        <th className="p-2.5 font-medium">Items</th>
+        <th className="p-2.5 font-medium">Total</th>
+        <th className="p-2.5 font-medium">Status</th>
+        <th className="p-2.5 font-medium">Date</th>
+        <th className="p-2.5 font-medium">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {filtered.map((order: Order, index: number) => (
+        <tr
+          key={order?.id || index}
+          className="border-b border-border/50 hover:bg-muted/50"
+        >
+          {/* ORDER ID */}
+          <td className="p-2.5 font-medium text-foreground">
+            {order?.id || "N/A"}
+          </td>
+
+          {/* CUSTOMER */}
+          <td className="p-2.5">
+            <p className="text-foreground font-medium">
+              {order?.customer || "Unknown Customer"}
+            </p>
+
+            <p className="text-[9px] text-muted-foreground">
+              {order?.email || "No Email"}
+            </p>
+          </td>
+
+          {/* ITEMS */}
+          <td className="p-2.5">
+            {(order?.items || [])
+              .slice(0, 2)
+              .map((item: any, i: number) => (
+                <p
+                  key={i}
+                  className="text-[9px] text-muted-foreground truncate max-w-[150px]"
+                >
+                  {item?.product?.name || "Unknown Product"} ×{" "}
+                  {item?.quantity || 0}
+                </p>
+              ))}
+
+            {(order?.items || []).length > 2 && (
+              <p className="text-[9px] text-primary">
+                +{(order?.items || []).length - 2} more
+              </p>
+            )}
+          </td>
+
+          {/* TOTAL */}
+          <td className="p-2.5 font-medium text-foreground">
+            KSH {(order?.total || 0).toLocaleString()}
+          </td>
+
+          {/* STATUS */}
+          <td className="p-2.5">
+            <StatusBadge status={order?.status || "pending"} />
+          </td>
+
+          {/* DATE */}
+          <td className="p-2.5 text-muted-foreground text-[10px]">
+            {order?.date || "No Date"}
+          </td>
+
+          {/* ACTIONS */}
+          <td className="p-2.5 flex items-center gap-1">
+            <select
+              value={order?.status || "pending"}
+              onChange={(e) => {
+                onUpdateStatus(order?.id, e.target.value);
+
+                toast.success(
+                  `Order ${order?.id || "N/A"} → ${e.target.value}`
+                );
+              }}
+              className="border border-border rounded px-1.5 py-1 text-[10px] bg-background text-foreground"
+            >
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+
+            <button
+              onClick={() => {
+                if (
+                  confirm(
+                    `Delete order ${order?.id || "this order"}?`
+                  )
+                ) {
+                  onDeleteOrder(order?.id);
+
+                  toast.success("Order deleted");
+                }
+              }}
+              className="p-1 border border-border rounded hover:bg-destructive/10 text-destructive"
+              title="Delete"
+            >
+              <Trash2 className="w-3 h-3" />
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  {filtered.length === 0 && (
+    <div className="p-6 text-center text-muted-foreground text-xs">
+      No orders match your filters
+    </div>
+  )}
+</div>
     </div>
   );
-};
+}
+
 
 /* ============ CUSTOMERS TAB ============ */
-const CustomersTab = ({ orders, onDeleteCustomer }: any) => {
+const CustomersTab = ({ orders = [], onDeleteCustomer }: any) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const customers = useMemo(() => {
-    const map: Record<string, { name: string; email: string; orders: number; total: number; lastOrder: string; items: number }> = {};
-    orders.forEach((o: Order) => {
-      if (!map[o.email]) map[o.email] = { name: o.customer, email: o.email, orders: 0, total: 0, lastOrder: o.date, items: 0 };
-      map[o.email].orders++;
-      map[o.email].total += o.total;
-      map[o.email].items += o.items.reduce((s: number, i: any) => s + i.quantity, 0);
-      if (o.date > map[o.email].lastOrder) map[o.email].lastOrder = o.date;
+    if (!Array.isArray(orders)) return [];
+
+    const map: Record<
+      string,
+      {
+        name: string;
+        email: string;
+        orders: number;
+        total: number;
+        lastOrder: string;
+        items: number;
+      }
+    > = {};
+
+    orders.forEach((o: any) => {
+      if (!o || !o.email) return;
+
+      if (!map[o.email]) {
+        map[o.email] = {
+          name: o.customer || "Unknown",
+          email: o.email,
+          orders: 0,
+          total: 0,
+          lastOrder: o.date || "",
+          items: 0,
+        };
+      }
+
+      map[o.email].orders += 1;
+      map[o.email].total += o.total || 0;
+
+      // ✅ SAFE reduce (fixes your crash)
+      map[o.email].items += (o.items || []).reduce(
+        (sum: number, item: any) => sum + (item?.quantity || 0),
+        0
+      );
+
+      // ✅ Safe date comparison
+      if (o.date && o.date > map[o.email].lastOrder) {
+        map[o.email].lastOrder = o.date;
+      }
     });
+
     return Object.values(map).sort((a, b) => b.total - a.total);
   }, [orders]);
 
   const filtered = useMemo(() => {
     if (!searchTerm) return customers;
+
     const q = searchTerm.toLowerCase();
-    return customers.filter(c => c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q));
+    return customers.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.email.toLowerCase().includes(q)
+    );
   }, [customers, searchTerm]);
+
+  const avgLTV = customers.length
+    ? Math.round(
+        customers.reduce((sum, c) => sum + c.total, 0) / customers.length
+      )
+    : 0;
 
   return (
     <div className="space-y-3">
+      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
-        <StatCard title="Total Customers" value={customers.length.toString()} icon={Users} color="bg-purple-500" />
-        <StatCard title="Avg. LTV" value={`KSH ${customers.length ? Math.round(customers.reduce((s, c) => s + c.total, 0) / customers.length).toLocaleString() : 0}`} icon={DollarSign} color="bg-green-500" />
-        <StatCard title="Repeat Customers" value={customers.filter(c => c.orders > 1).length.toString()} icon={RefreshCw} color="bg-blue-500" />
+        <StatCard
+          title="Total Customers"
+          value={customers.length.toString()}
+          icon={Users}
+          color="bg-purple-500"
+        />
+        <StatCard
+          title="Avg. LTV"
+          value={`KSH ${avgLTV.toLocaleString()}`}
+          icon={DollarSign}
+          color="bg-green-500"
+        />
+        <StatCard
+          title="Repeat Customers"
+          value={customers
+            .filter((c) => c.orders > 1)
+            .length.toString()}
+          icon={RefreshCw}
+          color="bg-blue-500"
+        />
       </div>
 
+      {/* Search */}
       <div className="relative w-fit">
         <Search className="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
-        <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Search customers..."
-          className="pl-7 pr-2 py-1.5 text-xs border border-border rounded-lg bg-background text-foreground w-44" />
+        <input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search customers..."
+          className="pl-7 pr-2 py-1.5 text-xs border border-border rounded-lg bg-background text-foreground w-44"
+        />
       </div>
 
+      {/* Table */}
       <div className="bg-card border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-xs min-w-[450px]">
-          <thead><tr className="border-b border-border bg-muted/50 text-left text-[10px] text-muted-foreground">
-            <th className="p-2.5 font-medium">Customer</th><th className="p-2.5 font-medium">Orders</th><th className="p-2.5 font-medium">Items</th><th className="p-2.5 font-medium">Total Spent</th><th className="p-2.5 font-medium">Last Order</th><th className="p-2.5 font-medium">Actions</th>
-          </tr></thead>
+          <thead>
+            <tr className="border-b border-border bg-muted/50 text-left text-[10px] text-muted-foreground">
+              <th className="p-2.5 font-medium">Customer</th>
+              <th className="p-2.5 font-medium">Orders</th>
+              <th className="p-2.5 font-medium">Items</th>
+              <th className="p-2.5 font-medium">Total Spent</th>
+              <th className="p-2.5 font-medium">Last Order</th>
+              <th className="p-2.5 font-medium">Actions</th>
+            </tr>
+          </thead>
+
           <tbody>
             {filtered.map((c) => (
-              <tr key={c.email} className="border-b border-border/50 hover:bg-muted/50">
+              <tr
+                key={c.email}
+                className="border-b border-border/50 hover:bg-muted/50"
+              >
                 <td className="p-2.5">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">{c.name.charAt(0)}</div>
+                    <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">
+                      {c.name?.charAt(0) || "?"}
+                    </div>
                     <div>
-                      <p className="font-medium text-foreground">{c.name}</p>
-                      <p className="text-[9px] text-muted-foreground">{c.email}</p>
+                      <p className="font-medium text-foreground">
+                        {c.name || "Unknown"}
+                      </p>
+                      <p className="text-[9px] text-muted-foreground">
+                        {c.email}
+                      </p>
                     </div>
                   </div>
                 </td>
-                <td className="p-2.5 font-medium text-foreground">{c.orders}</td>
-                <td className="p-2.5 text-muted-foreground">{c.items}</td>
-                <td className="p-2.5 font-medium text-foreground">KSH {c.total.toLocaleString()}</td>
-                <td className="p-2.5 text-muted-foreground text-[10px]">{c.lastOrder}</td>
+
+                <td className="p-2.5 font-medium text-foreground">
+                  {c.orders}
+                </td>
+
+                <td className="p-2.5 text-muted-foreground">
+                  {c.items}
+                </td>
+
+                <td className="p-2.5 font-medium text-foreground">
+                  KSH {c.total.toLocaleString()}
+                </td>
+
+                <td className="p-2.5 text-muted-foreground text-[10px]">
+                  {c.lastOrder || "-"}
+                </td>
+
                 <td className="p-2.5">
-                  <button onClick={() => { if (confirm(`Delete customer ${c.name} and all their orders?`)) { onDeleteCustomer(c.email); toast.success("Customer deleted"); } }}
-                    className="p-1 border border-border rounded hover:bg-destructive/10 text-destructive" title="Delete">
+                  <button
+                    onClick={() => {
+                      if (
+                        confirm(
+                          `Delete customer ${c.name} and all their orders?`
+                        )
+                      ) {
+                        onDeleteCustomer?.(c.email);
+                        toast.success("Customer deleted");
+                      }
+                    }}
+                    className="p-1 border border-border rounded hover:bg-destructive/10 text-destructive"
+                    title="Delete"
+                  >
                     <Trash2 className="w-3 h-3" />
                   </button>
                 </td>
@@ -825,29 +1048,91 @@ const CustomersTab = ({ orders, onDeleteCustomer }: any) => {
             ))}
           </tbody>
         </table>
-        {filtered.length === 0 && <div className="p-6 text-center text-muted-foreground text-xs">No customers found</div>}
+
+        {filtered.length === 0 && (
+          <div className="p-6 text-center text-muted-foreground text-xs">
+            No customers found
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 /* ============ REPORTS TAB ============ */
-const ReportsTab = ({ orders, products }: { orders: Order[]; products: Product[] }) => {
-  const [reportDate, setReportDate] = useState(new Date().toISOString().split("T")[0]);
+const ReportsTab = ({
+  orders = [],
+  products = [],
+}: {
+  orders: Order[];
+  products: Product[];
+}) => {
+  const [reportDate, setReportDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [reportNotes, setReportNotes] = useState("");
-  const [reportType, setReportType] = useState<"full" | "sales" | "inventory" | "customers">("full");
+  const [reportType, setReportType] = useState<
+    "full" | "sales" | "inventory" | "customers"
+  >("full");
 
-  const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
-  const avgOrderValue = orders.length ? totalRevenue / orders.length : 0;
-  const totalInventoryValue = products.reduce((s, p) => s + p.price * (p.stockQuantity ?? 0), 0);
-  const lowStockProducts = products.filter(p => (p.stockQuantity ?? 100) <= 10 && p.inStock);
-  const outOfStockProducts = products.filter(p => !p.inStock);
+  // ✅ SAFE DATA (prevents all crashes)
+  const safeOrders = Array.isArray(orders) ? orders : [];
+  const safeProducts = Array.isArray(products) ? products : [];
+
+  const normalizedOrders = safeOrders.map((o: any) => ({
+    ...o,
+    items: Array.isArray(o.items) ? o.items : [],
+  }));
+
+  // =====================
+  // SAFE CALCULATIONS
+  // =====================
+  const totalRevenue = normalizedOrders.reduce(
+    (s, o) => s + (o.total || 0),
+    0
+  );
+
+  const avgOrderValue = normalizedOrders.length
+    ? totalRevenue / normalizedOrders.length
+    : 0;
+
+  const totalInventoryValue = safeProducts.reduce(
+    (s, p) => s + (p.price || 0) * (p.stockQuantity ?? 0),
+    0
+  );
+
+  const lowStockProducts = safeProducts.filter(
+    (p) => (p.stockQuantity ?? 100) <= 10 && p.inStock
+  );
+
   const estimatedCost = totalRevenue * 0.6;
   const grossProfit = totalRevenue - estimatedCost;
-  const profitMargin = totalRevenue ? Math.round((grossProfit / totalRevenue) * 100) : 0;
+  const profitMargin = totalRevenue
+    ? Math.round((grossProfit / totalRevenue) * 100)
+    : 0;
 
+  // =====================
+  // FLATTENED ITEMS (SAFE)
+  // =====================
+  const itemsSold = useMemo(() => {
+    return normalizedOrders.flatMap((o: any) =>
+      (o.items || []).map((item: any, i: number) => ({
+        key: `${o.id}-${i}`,
+        product: item?.product || {},
+        quantity: item?.quantity || 0,
+        orderId: o.id,
+        customer: o.customer || "Unknown",
+        date: o.date || "",
+      }))
+    );
+  }, [normalizedOrders]);
+
+  // =====================
+  // PDF GENERATION
+  // =====================
   const generatePDF = () => {
     const doc = new jsPDF();
+
     const titles: Record<string, string> = {
       full: "Complete Business Report",
       sales: "Sales Report",
@@ -856,210 +1141,188 @@ const ReportsTab = ({ orders, products }: { orders: Order[]; products: Product[]
     };
 
     doc.setFontSize(18);
-    doc.setFont("helvetica", "bold");
     doc.text("DMT Auto Parts", 14, 20);
+
     doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
     doc.text(`${titles[reportType]} — ${reportDate}`, 14, 28);
-    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 34);
 
-    let y = 44;
+    let y = 40;
 
+    // ================= SALES =================
     if (reportType === "full" || reportType === "sales") {
-      doc.setFontSize(13);
-      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
       doc.text("Financial Summary", 14, y);
       y += 8;
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      const financials = [
-        `Total Revenue: KSH ${totalRevenue.toLocaleString()}`,
-        `Cost of Goods (est): KSH ${estimatedCost.toLocaleString()}`,
-        `Gross Profit: KSH ${grossProfit.toLocaleString()}`,
-        `Profit Margin: ${profitMargin}%`,
-        `Total Orders: ${orders.length}`,
-        `Avg Order Value: KSH ${avgOrderValue.toFixed(0)}`,
-      ];
-      financials.forEach(line => { doc.text(line, 14, y); y += 5; });
-      y += 5;
 
-      doc.setFontSize(13);
-      doc.setFont("helvetica", "bold");
-      doc.text("Order Details", 14, y);
+      const lines = [
+        `Revenue: KSH ${totalRevenue.toLocaleString()}`,
+        `Profit: KSH ${grossProfit.toLocaleString()}`,
+        `Margin: ${profitMargin}%`,
+        `Orders: ${normalizedOrders.length}`,
+        `Avg Order: KSH ${avgOrderValue.toFixed(0)}`,
+      ];
+
+      lines.forEach((l) => {
+        doc.text(l, 14, y);
+        y += 6;
+      });
+
       y += 4;
 
       autoTable(doc, {
         startY: y,
-        head: [["Order ID", "Customer", "Email", "Items", "Total (KSH)", "Status", "Date"]],
-        body: orders.map(o => [
-          o.id, o.customer, o.email,
-          o.items.map(i => `${i.product.name} x${i.quantity}`).join("; "),
-          o.total.toLocaleString(), o.status, o.date
+        head: [["Order", "Customer", "Items", "Total", "Date"]],
+        body: normalizedOrders.map((o: any) => [
+          o.id,
+          o.customer,
+          (o.items || [])
+            .map(
+              (i: any) =>
+                `${i?.product?.name || "Item"} x${i?.quantity || 0}`
+            )
+            .join("; "),
+          (o.total || 0).toLocaleString(),
+          o.date,
         ]),
         styles: { fontSize: 7 },
-        headStyles: { fillColor: [41, 128, 185] },
       });
     }
 
+    // ================= INVENTORY =================
     if (reportType === "full" || reportType === "inventory") {
       doc.addPage();
-      doc.setFontSize(13);
-      doc.setFont("helvetica", "bold");
-      doc.text("Product Inventory", 14, 20);
 
       autoTable(doc, {
-        startY: 26,
-        head: [["Product", "Category", "Price (KSH)", "Stock Qty", "Status", "Rating"]],
-        body: products.map(p => [p.name, p.category, p.price.toLocaleString(), (p.stockQuantity ?? 0).toString(), p.inStock ? "In Stock" : "Out", `${p.rating}/5`]),
+        startY: 20,
+        head: [["Product", "Category", "Price", "Stock", "Status"]],
+        body: safeProducts.map((p: any) => [
+          p.name,
+          p.category,
+          (p.price || 0).toLocaleString(),
+          (p.stockQuantity ?? 0).toString(),
+          p.inStock ? "In Stock" : "Out",
+        ]),
         styles: { fontSize: 7 },
-        headStyles: { fillColor: [41, 128, 185] },
       });
-
-      if (lowStockProducts.length > 0) {
-        const finalY = (doc as any).lastAutoTable?.finalY || 100;
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "bold");
-        doc.text("⚠ Low Stock Alert", 14, finalY + 10);
-        autoTable(doc, {
-          startY: finalY + 14,
-          head: [["Product", "Category", "Price", "Qty Remaining"]],
-          body: lowStockProducts.map(p => [p.name, p.category, `KSH ${p.price.toLocaleString()}`, (p.stockQuantity ?? 0).toString()]),
-          styles: { fontSize: 8 },
-          headStyles: { fillColor: [230, 126, 34] },
-        });
-      }
     }
 
+    // ================= CUSTOMERS =================
     if (reportType === "full" || reportType === "customers") {
       doc.addPage();
-      doc.setFontSize(13);
-      doc.setFont("helvetica", "bold");
-      doc.text("Customer Summary", 14, 20);
 
-      const custMap: Record<string, { name: string; email: string; orders: number; total: number }> = {};
-      orders.forEach(o => {
-        if (!custMap[o.email]) custMap[o.email] = { name: o.customer, email: o.email, orders: 0, total: 0 };
-        custMap[o.email].orders++;
-        custMap[o.email].total += o.total;
+      const custMap: Record<
+        string,
+        { name: string; email: string; orders: number; total: number }
+      > = {};
+
+      normalizedOrders.forEach((o: any) => {
+        if (!o.email) return;
+
+        if (!custMap[o.email]) {
+          custMap[o.email] = {
+            name: o.customer || "Unknown",
+            email: o.email,
+            orders: 0,
+            total: 0,
+          };
+        }
+
+        custMap[o.email].orders += 1;
+        custMap[o.email].total += o.total || 0;
       });
 
       autoTable(doc, {
-        startY: 26,
-        head: [["Customer", "Email", "Orders", "Total Spent (KSH)"]],
-        body: Object.values(custMap).map(c => [c.name, c.email, c.orders.toString(), c.total.toLocaleString()]),
+        startY: 20,
+        head: [["Customer", "Email", "Orders", "Total"]],
+        body: Object.values(custMap).map((c) => [
+          c.name,
+          c.email,
+          c.orders.toString(),
+          c.total.toLocaleString(),
+        ]),
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [142, 68, 173] },
       });
     }
 
+    // ================= NOTES =================
     if (reportNotes) {
       doc.addPage();
-      doc.setFontSize(13);
-      doc.setFont("helvetica", "bold");
       doc.text("Admin Notes", 14, 20);
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
       const lines = doc.splitTextToSize(reportNotes, 180);
-      doc.text(lines, 14, 28);
+      doc.text(lines, 14, 30);
     }
 
-    const suffix = reportType === "full" ? "Complete" : reportType.charAt(0).toUpperCase() + reportType.slice(1);
-    doc.save(`DMT-${suffix}-Report-${reportDate}.pdf`);
-    toast.success(`${suffix} report downloaded!`);
+    doc.save(`Report-${reportDate}.pdf`);
+    toast.success("Report downloaded!");
   };
 
   return (
     <div className="space-y-4">
+      {/* ================= STATS ================= */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
-        <StatCard title="Revenue" value={`KSH ${totalRevenue.toLocaleString()}`} icon={DollarSign} color="bg-green-500" />
-        <StatCard title="Gross Profit" value={`KSH ${grossProfit.toLocaleString()}`} icon={TrendingUp} color="bg-emerald-500" />
-        <StatCard title="Margin" value={`${profitMargin}%`} icon={Percent} color="bg-cyan-500" />
-        <StatCard title="Avg. Order" value={`KSH ${avgOrderValue.toFixed(0)}`} icon={Target} color="bg-blue-500" />
-        <StatCard title="Inventory Value" value={`KSH ${totalInventoryValue.toLocaleString()}`} icon={Boxes} color="bg-purple-500" />
-        <StatCard title="Low Stock" value={lowStockProducts.length.toString()} icon={AlertCircle} color="bg-amber-500" />
+        <StatCard
+          title="Revenue"
+          value={`KSH ${totalRevenue.toLocaleString()}`}
+          icon={DollarSign}
+          color="bg-green-500"
+        />
+        <StatCard
+          title="Profit"
+          value={`KSH ${grossProfit.toLocaleString()}`}
+          icon={TrendingUp}
+          color="bg-emerald-500"
+        />
+        <StatCard
+          title="Margin"
+          value={`${profitMargin}%`}
+          icon={Percent}
+          color="bg-cyan-500"
+        />
+        <StatCard
+          title="Orders"
+          value={normalizedOrders.length.toString()}
+          icon={Target}
+          color="bg-blue-500"
+        />
+        <StatCard
+          title="Inventory"
+          value={`KSH ${totalInventoryValue.toLocaleString()}`}
+          icon={Boxes}
+          color="bg-purple-500"
+        />
+        <StatCard
+          title="Low Stock"
+          value={lowStockProducts.length.toString()}
+          icon={AlertCircle}
+          color="bg-amber-500"
+        />
       </div>
 
-      {/* Products Sold */}
-      <div className="bg-card border border-border rounded-xl p-3">
-        <h3 className="font-semibold text-xs text-foreground mb-2 flex items-center gap-1.5">
-          <ShoppingBag className="w-3.5 h-3.5 text-primary" /> Items Sold
-        </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs min-w-[400px]">
-            <thead><tr className="border-b border-border text-left text-[10px] text-muted-foreground">
-              <th className="pb-2 font-medium">Product</th><th className="pb-2 font-medium">Qty</th><th className="pb-2 font-medium">Revenue</th><th className="pb-2 font-medium">Order</th><th className="pb-2 font-medium">Customer</th><th className="pb-2 font-medium">Date</th>
-            </tr></thead>
-            <tbody>
-              {orders.flatMap((o: Order) => o.items.map((item: any, i: number) => (
-                <tr key={`${o.id}-${i}`} className="border-b border-border/50 hover:bg-muted/50">
-                  <td className="py-1.5 flex items-center gap-1.5">
-                    <img src={item.product.images?.[0] || item.product.image} alt="" className="w-6 h-6 rounded bg-muted object-contain p-0.5" />
-                    <span className="text-[10px] text-foreground truncate max-w-[150px]">{item.product.name}</span>
-                  </td>
-                  <td className="py-1.5 font-medium text-foreground">{item.quantity}</td>
-                  <td className="py-1.5 font-medium text-foreground">KSH {(item.product.price * item.quantity).toLocaleString()}</td>
-                  <td className="py-1.5 text-muted-foreground">{o.id}</td>
-                  <td className="py-1.5 text-muted-foreground">{o.customer}</td>
-                  <td className="py-1.5 text-muted-foreground text-[9px]">{o.date}</td>
-                </tr>
-              )))}
-            </tbody>
-          </table>
-        </div>
+      {/* ================= ITEMS SOLD ================= */}
+      <div className="bg-card border rounded-xl p-3">
+        <table className="w-full text-xs">
+          <tbody>
+            {itemsSold.map((item: any) => (
+              <tr key={item.key}>
+                <td>{item.product?.name || "Unknown"}</td>
+                <td>{item.quantity}</td>
+                <td>
+                  KSH{" "}
+                  {(
+                    (item.product?.price || 0) * item.quantity
+                  ).toLocaleString()}
+                </td>
+                <td>{item.orderId}</td>
+                <td>{item.customer}</td>
+                <td>{item.date}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* Generate PDF */}
-      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-        <h3 className="font-semibold text-sm text-foreground flex items-center gap-1.5"><FileDown className="w-4 h-4 text-primary" /> Generate Report</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          <div>
-            <label className="text-[10px] font-medium text-muted-foreground mb-1 block">Report Date</label>
-            <input type="date" value={reportDate} onChange={e => setReportDate(e.target.value)}
-              className="w-full border border-border rounded-lg px-3 py-2 text-xs bg-background text-foreground" />
-          </div>
-          <div>
-            <label className="text-[10px] font-medium text-muted-foreground mb-1 block">Report Type</label>
-            <select value={reportType} onChange={e => setReportType(e.target.value as any)}
-              className="w-full border border-border rounded-lg px-3 py-2 text-xs bg-background text-foreground">
-              <option value="full">Full Report</option>
-              <option value="sales">Sales Only</option>
-              <option value="inventory">Inventory Only</option>
-              <option value="customers">Customers Only</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label className="text-[10px] font-medium text-muted-foreground mb-1 block">Notes</label>
-          <textarea value={reportNotes} onChange={e => setReportNotes(e.target.value)} placeholder="Admin notes..."
-            className="w-full border border-border rounded-lg px-3 py-2 text-xs bg-background text-foreground" rows={2} />
-        </div>
-        <button onClick={generatePDF} className="bg-primary text-primary-foreground px-5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 hover:opacity-90 shadow-sm">
-          <FileDown className="w-3.5 h-3.5" /> Download {reportType === "full" ? "Complete" : reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report
-        </button>
-      </div>
-
-      {/* Business Progress */}
-      <div className="bg-card border border-border rounded-xl p-3">
-        <h3 className="font-semibold text-xs text-foreground mb-3 flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-primary" /> Business Health</h3>
-        <div className="space-y-2.5">
-          {[
-            { label: "Product Catalog", value: products.length, max: 100, desc: `${products.length}/100`, color: "bg-primary" },
-            { label: "Order Fulfillment", value: orders.filter((o: Order) => o.status === "delivered").length, max: orders.length || 1, desc: `${orders.filter((o: Order) => o.status === "delivered").length}/${orders.length}`, color: "bg-green-500" },
-            { label: "Stock Health", value: products.filter(p => p.inStock).length, max: products.length || 1, desc: `${products.filter(p => p.inStock).length}/${products.length}`, color: "bg-blue-500" },
-            { label: "Profit Margin", value: profitMargin, max: 100, desc: `${profitMargin}%`, color: "bg-emerald-500" },
-          ].map(item => (
-            <div key={item.label}>
-              <div className="flex justify-between text-[10px] mb-0.5">
-                <span className="font-medium text-foreground">{item.label}</span>
-                <span className="text-muted-foreground">{item.desc}</span>
-              </div>
-              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                <div className={`h-full ${item.color} rounded-full transition-all duration-700`} style={{ width: `${Math.min((item.value / item.max) * 100, 100)}%` }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* ================= GENERATE ================= */}
+      <button onClick={generatePDF}>Download Report</button>
     </div>
   );
 };

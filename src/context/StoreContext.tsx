@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useContext,
@@ -10,7 +11,6 @@ import {
   Product,
   CartItem,
   Order,
-  sampleOrders,
 } from "@/data/store";
 
 import { api } from "@/lib/api";
@@ -33,19 +33,19 @@ interface StoreContextType {
   toggleWishlist: (productId: string) => void;
 
   orders: Order[];
-  addOrder: (order: Order) => void;
+  addOrder: (order: Order) => Promise<void>;
   updateOrderStatus: (
     orderId: string,
     status: Order["status"]
-  ) => void;
+  ) => Promise<void>;
 
   products: Product[];
   productsLoading: boolean;
   refreshProducts: () => Promise<void>;
 
-  addProduct: (product: Product) => void;
-  updateProduct: (product: Product) => void;
-  deleteProduct: (productId: string) => void;
+  addProduct: (product: Product) => Promise<void>;
+  updateProduct: (product: Product) => Promise<void>;
+  deleteProduct: (productId: string) => Promise<void>;
 
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -103,7 +103,7 @@ export const StoreProvider = ({
     useState<string[]>([]);
 
   const [orders, setOrders] =
-    useState<Order[]>(sampleOrders);
+    useState<Order[]>([]);
 
   const [products, setProducts] =
     useState<Product[]>([]);
@@ -119,9 +119,7 @@ export const StoreProvider = ({
   ========================= */
 
   const fetchProducts = async () => {
-
     try {
-
       setProductsLoading(true);
 
       const data =
@@ -131,30 +129,42 @@ export const StoreProvider = ({
         data.map(mapDbProduct)
       );
 
-      console.log(
-        "STORE PRODUCTS:",
-        data
-      );
+      console.log("STORE PRODUCTS:", data);
 
     } catch (error) {
-
       console.error(
         "Failed to fetch products:",
         error
       );
-
     } finally {
-
       setProductsLoading(false);
-
     }
+  };
 
+  /* =========================
+     FETCH ORDERS
+  ========================= */
+
+  const fetchOrders = async () => {
+    try {
+      const data =
+        await api.getOrders();
+
+      setOrders(data);
+
+      console.log("ORDERS:", data);
+
+    } catch (error) {
+      console.error(
+        "Failed to fetch orders:",
+        error
+      );
+    }
   };
 
   useEffect(() => {
-
     fetchProducts();
-
+    fetchOrders();
   }, []);
 
   /* =========================
@@ -174,7 +184,6 @@ export const StoreProvider = ({
         );
 
       if (existing) {
-
         return prev.map((item) =>
           item.product.id === product.id
             ? {
@@ -184,7 +193,6 @@ export const StoreProvider = ({
               }
             : item
         );
-
       }
 
       return [
@@ -194,22 +202,18 @@ export const StoreProvider = ({
           quantity: 1,
         },
       ];
-
     });
-
   };
 
   const removeFromCart = (
     productId: string
   ) => {
-
     setCart((prev) =>
       prev.filter(
         (item) =>
           item.product.id !== productId
       )
     );
-
   };
 
   const updateQuantity = (
@@ -218,11 +222,8 @@ export const StoreProvider = ({
   ) => {
 
     if (quantity <= 0) {
-
       removeFromCart(productId);
-
       return;
-
     }
 
     setCart((prev) =>
@@ -232,7 +233,6 @@ export const StoreProvider = ({
           : item
       )
     );
-
   };
 
   const clearCart = () =>
@@ -261,75 +261,89 @@ export const StoreProvider = ({
   const addProduct = async (
     product: Product
   ) => {
-
     try {
-
       await api.createProduct(product);
-
       await fetchProducts();
-
     } catch (error) {
-
       console.error(
         "Failed to add product:",
         error
       );
-
     }
-
   };
 
   const updateProduct = async (
     product: Product
   ) => {
-
     try {
-
       await api.updateProduct(
         product.id,
         product
       );
-
       await fetchProducts();
-
     } catch (error) {
-
       console.error(
         "Failed to update product:",
         error
       );
-
     }
-
   };
 
   const deleteProduct = async (
     productId: string
   ) => {
-
     try {
-
       await api.deleteProduct(
         productId
       );
-
       await fetchProducts();
-
     } catch (error) {
-
       console.error(
         "Failed to delete product:",
         error
       );
-
     }
+  };
 
+  /* =========================
+     ORDER CRUD (BACKEND)
+  ========================= */
+
+  const addOrder = async (
+    order: Order
+  ) => {
+    try {
+      await api.createOrder(order);
+      await fetchOrders();
+    } catch (error) {
+      console.error(
+        "Failed to add order:",
+        error
+      );
+    }
+  };
+
+  const updateOrderStatus = async (
+    orderId: string,
+    status: Order["status"]
+  ) => {
+    try {
+      await api.updateOrder(
+        orderId,
+        { status }
+      );
+      await fetchOrders();
+    } catch (error) {
+      console.error(
+        "Failed to update order:",
+        error
+      );
+    }
   };
 
   /* ========================= */
 
   return (
-
     <StoreContext.Provider
       value={{
 
@@ -355,25 +369,8 @@ export const StoreProvider = ({
             ),
 
         orders,
-        addOrder:
-          (order: Order) =>
-            setOrders((prev) => [
-              order,
-              ...prev,
-            ]),
-
-        updateOrderStatus:
-          (orderId, status) =>
-            setOrders((prev) =>
-              prev.map((order) =>
-                order.id === orderId
-                  ? {
-                      ...order,
-                      status,
-                    }
-                  : order
-              )
-            ),
+        addOrder,
+        updateOrderStatus,
 
         products,
         productsLoading,
@@ -389,13 +386,9 @@ export const StoreProvider = ({
 
       }}
     >
-
       {children}
-
     </StoreContext.Provider>
-
   );
-
 };
 
 /* ----------------------------- */
@@ -408,13 +401,11 @@ export const useStore = () => {
     useContext(StoreContext);
 
   if (!context) {
-
     throw new Error(
       "useStore must be used within StoreProvider"
     );
-
   }
 
   return context;
-
 };
+

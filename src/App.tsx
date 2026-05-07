@@ -6,66 +6,93 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { StoreProvider } from "@/context/StoreContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
-import Index from "./pages/Index.tsx";
-import ShopPage from "./pages/ShopPage.tsx";
-import CartPage from "./pages/CartPage.tsx";
-import AdminPage from "./pages/AdminPage.tsx";
-import AuthPage from "./pages/AuthPage.tsx";
-import ProductDetailPage from "./pages/ProductDetailPage.tsx";
-import FAQPage from "./pages/FAQPage.tsx";
-import WishlistPage from "./pages/WishlistPage.tsx";
-import ReturnsPage from "./pages/ReturnsPage.tsx";
-import ShippingPage from "./pages/ShippingPage.tsx";
-import WarrantyPage from "./pages/WarrantyPage.tsx";
-import BlogPage from "./pages/BlogPage.tsx";
-import AboutPage from "./pages/AboutPage.tsx";
-import ContactPage from "./pages/ContactPage.tsx";
-import NotFound from "./pages/NotFound.tsx";
+
+import Index from "./pages/Index";
+import ShopPage from "./pages/ShopPage";
+import CartPage from "./pages/CartPage";
+import AdminPage from "./pages/AdminPage";
+import AuthPage from "./pages/AuthPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
+import FAQPage from "./pages/FAQPage";
+import WishlistPage from "./pages/WishlistPage";
+import ReturnsPage from "./pages/ReturnsPage";
+import ShippingPage from "./pages/ShippingPage";
+import WarrantyPage from "./pages/WarrantyPage";
+import BlogPage from "./pages/BlogPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
+import NotFound from "./pages/NotFound";
+import CategoryPage from "./pages/CategoryPage";
+
 import WhatsAppButton from "@/components/WhatsAppButton";
 import LiveChat from "@/components/LiveChat";
-import CategoryPage from "@/pages/CategoryPage";
 import ScrollToTop from "@/components/ScrollToTop";
-
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <TooltipProvider>
-        <AuthProvider>
-          <StoreProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <WhatsAppButton />
-              <LiveChat />
-              <ScrollToTop />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/shop" element={<ShopPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/product/:id" element={<ProductDetailPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/faq" element={<FAQPage />} />
-                <Route path="/wishlist" element={<WishlistPage />} />
-                <Route path="/returns" element={<ReturnsPage />} />
-                <Route path="/shipping" element={<ShippingPage />} />
-                <Route path="/warranty" element={<WarrantyPage />} />
-                <Route path="/blog" element={<BlogPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/category/:category/:subcategory" element={<CategoryPage />} />
-                <Route path="/category/:category" element={<CategoryPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </StoreProvider>
-        </AuthProvider>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <StoreProvider>
+              <BrowserRouter
+                future={{
+                  v7_startTransition: true,
+                  v7_relativeSplatPath: true,
+                }}
+              >
+                <ScrollToTop />
+
+
+                {/* Global Floating Components */}
+                <WhatsAppButton />
+                <LiveChat />
+
+                {/* Notifications */}
+                <Toaster />
+                <Sonner />
+
+                {/* Routes */}
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/shop" element={<ShopPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/product/:id" element={<ProductDetailPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/auth" element={<AuthPage />} />
+
+                  {/* Info Pages */}
+                  <Route path="/faq" element={<FAQPage />} />
+                  <Route path="/wishlist" element={<WishlistPage />} />
+                  <Route path="/returns" element={<ReturnsPage />} />
+                  <Route path="/shipping" element={<ShippingPage />} />
+                  <Route path="/warranty" element={<WarrantyPage />} />
+                  <Route path="/blog" element={<BlogPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+
+                  {/* Category Routes */}
+                  <Route
+                    path="/category/:category/:subcategory"
+                    element={<CategoryPage />}
+                  />
+                  <Route
+                    path="/category/:category"
+                    element={<CategoryPage />}
+                  />
+
+                  {/* 404 */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </StoreProvider>
+          </AuthProvider>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

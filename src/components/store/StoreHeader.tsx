@@ -535,12 +535,12 @@ setShopOpen(false)
 }
 >
 
-<div className="flex items-center gap-1 cursor-pointer">
+<div className="flex items-center gap-1">
+  <Link to="/shop" className="hover:text-orange-500">
+    Shop
+  </Link>
 
-Shop
-
-<ChevronDown className="w-3 h-3" />
-
+  <ChevronDown className="w-3 h-3 cursor-pointer" />
 </div>
 
 {shopOpen && (

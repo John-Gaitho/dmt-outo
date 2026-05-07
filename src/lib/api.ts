@@ -75,7 +75,7 @@ export const api = {
 
     const res =
       await axiosInstance.get(
-        "/products"
+        "/products/"
       );
 
     return res.data;
@@ -88,7 +88,7 @@ export const api = {
 
     const res =
       await axiosInstance.post(
-        "/products",
+        "/products/",
         data
       );
 
@@ -177,7 +177,7 @@ export const api = {
 
     const res =
       await axiosInstance.get(
-        "/daily-sales"
+        "/sales"
       );
 
     return res.data;
@@ -190,7 +190,7 @@ export const api = {
 
     const res =
       await axiosInstance.post(
-        "/daily-sales",
+        "/sales",
         data
       );
 
@@ -199,12 +199,12 @@ export const api = {
   },
 
   deleteDailySale: async (
-    id: number
+    id: string
   ) => {
 
     const res =
       await axiosInstance.delete(
-        `/daily-sales/${id}`
+        `/sales/${id}`
       );
 
     return res.data;
