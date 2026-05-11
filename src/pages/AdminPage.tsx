@@ -24,6 +24,7 @@ import CustomersTab from "@/components/admin/CustomersTab";
 import OrdersTab from "@/components/admin/OrdersTab";
 import ProductsTab from "@/components/admin/ProductsTab";
 import ReportsTab from "@/components/admin/ReportsTab";
+import CreditRecordsTab from "@/components/admin/CreditRecords";
 
 
 
@@ -68,6 +69,7 @@ const AdminPage = () => {
     { icon: Package, label: "Products", tab: "products", badge: lowStockProducts.length || undefined },
     { icon: ShoppingCart, label: "Orders", tab: "orders", badge: pendingOrders || undefined },
     { icon: Users, label: "Customers", tab: "customers" },
+    { icon: CreditCard, label: "Credit Records", tab: "credit-records" },
     { icon: Receipt, label: "Daily Sales", tab: "daily-sales" },
     { icon: BarChart3, label: "Reports", tab: "reports" },
     { icon: Settings, label: "Settings", tab: "settings" },
@@ -690,7 +692,6 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
     </div>
   );
 };
-
 /* ============ ORDERS TAB ============ */
 const OrdersTab = ({ orders, onUpdateStatus, onDeleteOrder }: any) => {
   const [filterStatus, setFilterStatus] = useState("");

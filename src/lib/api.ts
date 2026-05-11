@@ -62,7 +62,7 @@ axiosInstance.interceptors.response.use(
 );
 
 /* =========================
-   PRODUCTS API
+   API
 ========================= */
 
 export const api = {
@@ -78,7 +78,24 @@ export const api = {
         "/products/"
       );
 
-    return res.data;
+    return res.data.map((p: any) => ({
+
+      ...p,
+
+      // ✅ snake_case -> camelCase
+      stockQuantity:
+        p.stock_quantity,
+
+      images:
+        p.image_urls || [],
+
+      image:
+        p.image_urls?.[0] || "",
+
+      inStock:
+        p.in_stock,
+
+    }));
 
   },
 
@@ -86,10 +103,23 @@ export const api = {
     data: any
   ) => {
 
+    const payload = {
+
+      ...data,
+
+      // ✅ camelCase -> snake_case
+      stock_quantity:
+        data.stockQuantity,
+
+      image_urls:
+        data.images || [],
+
+    };
+
     const res =
       await axiosInstance.post(
         "/products/",
-        data
+        payload
       );
 
     return res.data;
@@ -97,14 +127,27 @@ export const api = {
   },
 
   updateProduct: async (
-    id: number,
+    id: string,
     data: any
   ) => {
+
+    const payload = {
+
+      ...data,
+
+      // ✅ camelCase -> snake_case
+      stock_quantity:
+        data.stockQuantity,
+
+      image_urls:
+        data.images || [],
+
+    };
 
     const res =
       await axiosInstance.put(
         `/products/${id}`,
-        data
+        payload
       );
 
     return res.data;
@@ -112,7 +155,7 @@ export const api = {
   },
 
   deleteProduct: async (
-    id: number
+    id: string
   ) => {
 
     const res =
@@ -140,7 +183,7 @@ export const api = {
   },
 
   updateOrderStatus: async (
-    id: number,
+    id: string,
     status: string
   ) => {
 
@@ -170,7 +213,7 @@ export const api = {
   },
 
   /* ======================
-     DAILY SALES (DMT)
+     DAILY SALES
   ====================== */
 
   getDailySales: async () => {
