@@ -28,13 +28,13 @@ import CreditRecordsTab from "@/components/admin/CreditRecords";
 
 
 
-type Tab = "dashboard" | "products" | "orders" | "customers" | "reports" | "settings" | "daily-sales";
+type Tab = "dashboard" | "products" | "orders" | "customers" | "reports" | "settings" | "daily-sales" | "credit";
 
 const CHART_COLORS = ["#f97316", "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#06b6d4", "#f59e0b", "#ec4899"];
 
 const AdminPage = () => {
   const { products, orders: storeOrders, addProduct, updateProduct, deleteProduct, updateOrderStatus } = useStore();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>(storeOrders);
   
   useEffect(() => { setOrders(storeOrders); }, [storeOrders]);
   
@@ -69,8 +69,8 @@ const AdminPage = () => {
     { icon: Package, label: "Products", tab: "products", badge: lowStockProducts.length || undefined },
     { icon: ShoppingCart, label: "Orders", tab: "orders", badge: pendingOrders || undefined },
     { icon: Users, label: "Customers", tab: "customers" },
-    { icon: CreditCard, label: "Credit Records", tab: "credit-records" },
     { icon: Receipt, label: "Daily Sales", tab: "daily-sales" },
+    { icon: CreditCard, label: "Credit", tab: "credit" },
     { icon: BarChart3, label: "Reports", tab: "reports" },
     { icon: Settings, label: "Settings", tab: "settings" },
   ];
@@ -181,6 +181,7 @@ const AdminPage = () => {
           {activeTab === "orders" && <OrdersTab orders={orders} onUpdateStatus={updateOrderStatus} onDeleteOrder={deleteOrder} />}
           {activeTab === "customers" && <CustomersTab orders={orders} onDeleteCustomer={(email: string) => setOrders(prev => prev.filter(o => o.email !== email))} />}
           {activeTab === "daily-sales" && <DailySalesTab />}
+          {activeTab === "credit" && <CreditRecordsTab />}
           {activeTab === "reports" && <ReportsTab orders={orders} products={products} />}
           {activeTab === "settings" && <SettingsTab onSignOut={signOut} />}
         </div>
@@ -345,7 +346,6 @@ const DashboardTab = ({ orders, products, lowStockProducts, setActiveTab }: any)
     </div>
   </div>
 )}
-
       {/* Recent Orders */}
       <div className="bg-card border border-border rounded-xl p-3 overflow-x-auto">
         <div className="flex items-center justify-between mb-2">

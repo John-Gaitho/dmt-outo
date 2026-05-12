@@ -12,25 +12,15 @@ const axiosInstance = axios.create({
    ATTACH TOKEN
 ========================= */
 
-axiosInstance.interceptors.request.use(
-  (config) => {
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
 
-    const token =
-      localStorage.getItem(
-        "access_token"
-      );
-
-    if (token) {
-
-      config.headers.Authorization =
-        `Bearer ${token}`;
-
-    }
-
-    return config;
-
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+
+  return config;
+});
 
 /* =========================
    GLOBAL ERROR HANDLER
@@ -38,26 +28,15 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (response) => response,
-
   (error) => {
-
     if (error.response?.status === 401) {
+      console.warn("Unauthorized — redirecting");
 
-      console.warn(
-        "Unauthorized — redirecting"
-      );
-
-      localStorage.removeItem(
-        "access_token"
-      );
-
-      window.location.href =
-        "/auth";
-
+      localStorage.removeItem("access_token");
+      window.location.href = "/auth";
     }
 
     return Promise.reject(error);
-
   }
 );
 
@@ -66,105 +45,47 @@ axiosInstance.interceptors.response.use(
 ========================= */
 
 export const api = {
-
   /* ======================
      PRODUCTS
   ====================== */
 
   getProducts: async () => {
-
-    const res =
-      await axiosInstance.get(
-        "/products/"
-      );
+    const res = await axiosInstance.get("/products/");
 
     return res.data.map((p: any) => ({
-
       ...p,
-
-      // ✅ snake_case -> camelCase
-      stockQuantity:
-        p.stock_quantity,
-
-      images:
-        p.image_urls || [],
-
-      image:
-        p.image_urls?.[0] || "",
-
-      inStock:
-        p.in_stock,
-
+      stockQuantity: p.stock_quantity,
+      images: p.image_urls || [],
+      image: p.image_urls?.[0] || "",
+      inStock: p.in_stock,
     }));
-
   },
 
-  createProduct: async (
-    data: any
-  ) => {
-
+  createProduct: async (data: any) => {
     const payload = {
-
       ...data,
-
-      // ✅ camelCase -> snake_case
-      stock_quantity:
-        data.stockQuantity,
-
-      image_urls:
-        data.images || [],
-
+      stock_quantity: data.stockQuantity,
+      image_urls: data.images || [],
     };
 
-    const res =
-      await axiosInstance.post(
-        "/products/",
-        payload
-      );
-
+    const res = await axiosInstance.post("/products/", payload);
     return res.data;
-
   },
 
-  updateProduct: async (
-    id: string,
-    data: any
-  ) => {
-
+  updateProduct: async (id: string, data: any) => {
     const payload = {
-
       ...data,
-
-      // ✅ camelCase -> snake_case
-      stock_quantity:
-        data.stockQuantity,
-
-      image_urls:
-        data.images || [],
-
+      stock_quantity: data.stockQuantity,
+      image_urls: data.images || [],
     };
 
-    const res =
-      await axiosInstance.put(
-        `/products/${id}`,
-        payload
-      );
-
+    const res = await axiosInstance.put(`/products/${id}`, payload);
     return res.data;
-
   },
 
-  deleteProduct: async (
-    id: string
-  ) => {
-
-    const res =
-      await axiosInstance.delete(
-        `/products/${id}`
-      );
-
+  deleteProduct: async (id: string) => {
+    const res = await axiosInstance.delete(`/products/${id}`);
     return res.data;
-
   },
 
   /* ======================
@@ -172,29 +93,13 @@ export const api = {
   ====================== */
 
   getOrders: async () => {
-
-    const res =
-      await axiosInstance.get(
-        "/orders"
-      );
-
+    const res = await axiosInstance.get("/orders/");
     return res.data;
-
   },
 
-  updateOrderStatus: async (
-    id: string,
-    status: string
-  ) => {
-
-    const res =
-      await axiosInstance.put(
-        `/orders/${id}`,
-        { status }
-      );
-
+  updateOrderStatus: async (id: string, status: string) => {
+    const res = await axiosInstance.put(`/orders/${id}`, { status });
     return res.data;
-
   },
 
   /* ======================
@@ -202,14 +107,8 @@ export const api = {
   ====================== */
 
   getCustomers: async () => {
-
-    const res =
-      await axiosInstance.get(
-        "/customers"
-      );
-
+    const res = await axiosInstance.get("/customers/");
     return res.data;
-
   },
 
   /* ======================
@@ -217,41 +116,41 @@ export const api = {
   ====================== */
 
   getDailySales: async () => {
-
-    const res =
-      await axiosInstance.get(
-        "/sales"
-      );
-
+    const res = await axiosInstance.get("/sales/");
     return res.data;
-
   },
 
-  createDailySale: async (
-    data: any
-  ) => {
-
-    const res =
-      await axiosInstance.post(
-        "/sales",
-        data
-      );
-
+  createDailySale: async (data: any) => {
+    const res = await axiosInstance.post("/sales/", data);
     return res.data;
-
   },
 
-  deleteDailySale: async (
-    id: string
-  ) => {
-
-    const res =
-      await axiosInstance.delete(
-        `/sales/${id}`
-      );
-
+  deleteDailySale: async (id: string) => {
+    const res = await axiosInstance.delete(`/sales/${id}`);
     return res.data;
+  },
 
-  }
+  /* ======================
+     CREDIT RECORDS (FIXED)
+  ====================== */
 
+  getCreditRecords: async () => {
+    const res = await axiosInstance.get("/credit-records/");
+    return res.data;
+  },
+
+  createCreditRecord: async (data: any) => {
+    const res = await axiosInstance.post("/credit-records/", data);
+    return res.data;
+  },
+
+  updateCreditRecord: async (id: string, data: any) => {
+    const res = await axiosInstance.put(`/credit-records/${id}`, data);
+    return res.data;
+  },
+
+  deleteCreditRecord: async (id: string) => {
+    const res = await axiosInstance.delete(`/credit-records/${id}`);
+    return res.data;
+  },
 };
