@@ -857,6 +857,12 @@ const CreditRecordsTab = () => {
                     Product
                   </th>
 
+                  
+                  <th className="text-right p-2.5">
+                    phone
+                  </th>
+
+
                   <th className="text-right p-2.5">
                     Amount
                   </th>
@@ -874,8 +880,25 @@ const CreditRecordsTab = () => {
                   </th>
 
                   <th className="text-right p-2.5">
+                    Sale Date
+                  </th>
+
+                  
+                  <th className="text-right p-2.5">
+                    Due Date 
+                  </th>
+
+                  <th className="text-right p-2.5">
+                    Notes
+                  </th>
+
+                  <th className="text-right p-2.5">
                     Actions
                   </th>
+
+
+                  
+
                 </tr>
               </thead>
 
@@ -901,6 +924,11 @@ const CreditRecordsTab = () => {
                         {r.product_name}
                       </td>
 
+                      <td className="p-2.5 text-right text-muted-foreground">
+                        {r.phone || "-"}
+                      </td>
+
+
                       <td className="p-2.5 text-right">
                         {Number(
                           r.amount
@@ -919,11 +947,24 @@ const CreditRecordsTab = () => {
                         ).toLocaleString()}
                       </td>
 
+
                       <td className="p-2.5">
                         <StatusPill
                           status={r.status}
                           overdue={overdue}
                         />
+                      </td>
+
+                      <td className="p-2.5 text-right">
+                        {r.sale_date ? new Date(r.sale_date).toLocaleDateString() : "-"}
+                      </td>
+
+                      <td className="p-2.5 text-right">
+                        {r.due_date ? new Date(r.due_date).toLocaleDateString() : "-"}
+                      </td>
+
+                      <td className="p-2.5 text-right text-muted-foreground">
+                        {r.notes || "-"}
                       </td>
 
                       <td className="p-2.5">
