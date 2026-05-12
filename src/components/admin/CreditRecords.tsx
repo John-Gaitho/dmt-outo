@@ -645,6 +645,188 @@ const CreditRecordsTab = () => {
             <Plus className="w-3 h-3" />
             Add Credit
           </button>
+          {showForm && (
+  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-3">
+
+    <div className="bg-card w-full max-w-2xl rounded-xl border border-border p-4">
+
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-3">
+        <h2 className="font-semibold text-sm">
+          {editingId ? "Edit Credit Record" : "New Credit Record"}
+        </h2>
+
+        <button onClick={() => setShowForm(false)}>
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* FORM GRID (SQUARE LAYOUT) */}
+      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-3 text-xs">
+
+        {/* Customer */}
+        <div className="col-span-2">
+          <label className="text-[10px] text-muted-foreground">Customer Name *</label>
+          <input
+            className="w-full border p-2 rounded"
+            value={form.customer_name}
+            onChange={(e) =>
+              setForm({ ...form, customer_name: e.target.value })
+            }
+          />
+        </div>
+
+        {/* Phone */}
+        <div>
+          <label className="text-[10px] text-muted-foreground">Phone</label>
+          <input
+            className="w-full border p-2 rounded"
+            value={form.phone}
+            onChange={(e) =>
+              setForm({ ...form, phone: e.target.value })
+            }
+          />
+        </div>
+
+        {/* ID */}
+        <div>
+          <label className="text-[10px] text-muted-foreground">ID Number</label>
+          <input
+            className="w-full border p-2 rounded"
+            value={form.id_number}
+            onChange={(e) =>
+              setForm({ ...form, id_number: e.target.value })
+            }
+          />
+        </div>
+
+        {/* Product */}
+        <div className="col-span-2">
+          <label className="text-[10px] text-muted-foreground">Product / Item *</label>
+          <input
+            className="w-full border p-2 rounded"
+            value={form.product_name}
+            onChange={(e) =>
+              setForm({ ...form, product_name: e.target.value })
+            }
+          />
+        </div>
+
+        {/* Quantity */}
+        <div>
+          <label className="text-[10px] text-muted-foreground">Quantity</label>
+          <input
+            type="number"
+            className="w-full border p-2 rounded"
+            value={form.quantity}
+            onChange={(e) =>
+              setForm({ ...form, quantity: Number(e.target.value) })
+            }
+          />
+        </div>
+
+        {/* Total */}
+        <div>
+          <label className="text-[10px] text-muted-foreground">Total (KSH)</label>
+          <input
+            type="number"
+            className="w-full border p-2 rounded"
+            value={form.amount}
+            onChange={(e) =>
+              setForm({ ...form, amount: Number(e.target.value) })
+            }
+          />
+        </div>
+
+        {/* Paid */}
+        <div>
+          <label className="text-[10px] text-muted-foreground">Paid (KSH)</label>
+          <input
+            type="number"
+            className="w-full border p-2 rounded"
+            value={form.paid_amount}
+            onChange={(e) =>
+              setForm({ ...form, paid_amount: Number(e.target.value) })
+            }
+          />
+        </div>
+
+        {/* Balance (AUTO) */}
+        <div>
+          <label className="text-[10px] text-muted-foreground">Balance</label>
+          <input
+            className="w-full border p-2 rounded bg-muted"
+            value={
+              (Number(form.amount) || 0) -
+              (Number(form.paid_amount) || 0)
+            }
+            readOnly
+          />
+        </div>
+
+        {/* Sale Date */}
+        <div>
+          <label className="text-[10px] text-muted-foreground">Sale Date</label>
+          <input
+            type="date"
+            className="w-full border p-2 rounded"
+            value={form.sale_date}
+            onChange={(e) =>
+              setForm({ ...form, sale_date: e.target.value })
+            }
+          />
+        </div>
+
+        {/* Due Date */}
+        <div>
+          <label className="text-[10px] text-muted-foreground">Due Date</label>
+          <input
+            type="date"
+            className="w-full border p-2 rounded"
+            value={form.due_date}
+            onChange={(e) =>
+              setForm({ ...form, due_date: e.target.value })
+            }
+          />
+        </div>
+
+        {/* Notes */}
+        <div className="col-span-2">
+          <label className="text-[10px] text-muted-foreground">Notes</label>
+          <textarea
+            className="w-full border p-2 rounded"
+            value={form.notes}
+            onChange={(e) =>
+              setForm({ ...form, notes: e.target.value })
+            }
+          />
+        </div>
+
+        {/* ACTIONS */}
+        <div className="col-span-2 flex gap-2 pt-2">
+
+          <button
+            type="button"
+            onClick={() => setShowForm(false)}
+            className="flex-1 bg-muted p-2 rounded text-xs"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            className="flex-1 bg-primary text-white p-2 rounded text-xs"
+          >
+            Save Record
+          </button>
+
+        </div>
+
+      </form>
+    </div>
+  </div>
+)}
+
         </div>
       </div>
 
