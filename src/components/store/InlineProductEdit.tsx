@@ -3,7 +3,6 @@ import { Product } from "@/data/store";
 import { X, Save, Plus, Trash2, Upload, Loader2 } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 import { toast } from "sonner";
-import api from "@/lib/api";
 
 interface Props {
   product: Product;
@@ -23,88 +22,74 @@ const categoryOptions = [
   "Filters",
 ];
 
-/* CATEGORY → SUBCATEGORY MAP */
-
 const subcategoryMap: Record<string, string[]> = {
   "Air & Fuel Delivery": [
     "Fuel Pumps",
     "Fuel Injectors",
     "Air Filters",
     "Throttle Bodies",
-    "Mass Air Flow Sensors"
+    "Mass Air Flow Sensors",
   ],
-
   "Exterior & Accessories": [
     "Side Mirrors",
     "Door Handles",
     "Bumpers",
     "Mud Flaps",
-    "Grilles"
+    "Grilles",
   ],
-
   "Headlights & Lighting": [
     "Bulbs",
     "Reflectors",
     "Corner Lights",
     "Running Lights",
-    "Fog Lights"
+    "Fog Lights",
   ],
-
   "Brakes & Rotors": [
     "Brake Pads",
     "Brake Discs",
     "Brake Calipers",
     "Brake Boosters",
-    "ABS Components"
+    "ABS Components",
   ],
-
   "Engines & Components": [
     "Gaskets",
     "Pistons",
     "Timing Belts",
     "Engine Mounts",
-    "Oil Pumps"
+    "Oil Pumps",
   ],
-
-  "Electrical": [
+  Electrical: [
     "Batteries",
     "Alternators",
     "Starters",
     "Ignition Coils",
-    "Sensors"
+    "Sensors",
   ],
-
-  "Interior": [
+  Interior: [
     "Seat Covers",
     "Dashboards",
     "Floor Mats",
     "Steering Covers",
-    "Door Panels"
+    "Door Panels",
   ],
-
-  "Suspension": [
+  Suspension: [
     "Shock Absorbers",
     "Struts",
     "Control Arms",
     "Ball Joints",
-    "Bushings"
+    "Bushings",
   ],
-
   "Oils & Fluids": [
     "Engine Oil",
     "Brake Fluid",
     "Coolant",
     "Transmission Fluid",
-    "Power Steering Fluid"
+    "Power Steering Fluid",
   ],
-
-  "Filters": [
-    "Oil Filters",
-    "Air Filters",
-    "Fuel Filters",
-    "Cabin Filters"
-  ]
+  Filters: ["Oil Filters", "Air Filters", "Fuel Filters", "Cabin Filters"],
 };
+
+const CLOUDINARY_CLOUD_NAME = "dljyn5jkq";
 
 const InlineProductEdit = ({ product, onClose }: Props) => {
   const { updateProduct } = useStore();
@@ -119,52 +104,53 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
   const set = (key: string, value: any) =>
     setForm((p) => ({ ...p, [key]: value }));
 
-  /* FILE UPLOAD */
-
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  /* ── CLOUDINARY UPLOAD ── */
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+    if (!uploadPreset) {
+      toast.error("Missing VITE_CLOUDINARY_UPLOAD_PRESET in .env");
+      return;
+    }
 
     setUploading(true);
 
     try {
-      for (const file of Array.from(files)) {
-        const ext = file.name.split(".").pop();
-        const path = `${crypto.randomUUID()}.${ext}`;
+      const uploadedUrls: string[] = await Promise.all(
+        Array.from(files).map(async (file) => {
+          const formPayload = new FormData();
+          formPayload.append("file", file);
+          formPayload.append("upload_preset", uploadPreset);
 
-        const { error } = await supabase.storage
-          .from("product-images")
-          .upload(path, file);
+          const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+            { method: "POST", body: formPayload }
+          );
 
-        if (error) {
-          toast.error(`Upload failed: ${error.message}`);
-          continue;
-        }
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error?.message || "Upload failed");
+          }
 
-        const { data: urlData } = supabase.storage
-          .from("product-images")
-          .getPublicUrl(path);
+          const data = await res.json();
+          return data.secure_url as string;
+        })
+      );
 
-        set("images", [
-          ...(form.images || []),
-          urlData.publicUrl,
-        ]);
-      }
-
-      toast.success("Image(s) uploaded!");
-    } catch {
-      toast.error("Upload failed");
+      set("images", [...(form.images || []), ...uploadedUrls]);
+      toast.success(`${uploadedUrls.length} image(s) uploaded!`);
+    } catch (err: any) {
+      toast.error(err.message || "Upload failed");
     } finally {
       setUploading(false);
-      if (fileInputRef.current)
-        fileInputRef.current.value = "";
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
-  /* VALIDATION */
-
+  /* ── VALIDATION ── */
   const validate = () => {
     if (!form.name.trim()) return "Name is required";
     if (form.price <= 0) return "Price must be greater than 0";
@@ -173,6 +159,7 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
     return null;
   };
 
+  /* ── SAVE ── */
   const handleSave = async () => {
     const err = validate();
     if (err) return toast.error(err);
@@ -190,47 +177,29 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
     }
   };
 
-  /* IMAGE HANDLING */
-
-  const addImage = () => {
+  /* ── IMAGE HELPERS ── */
+  const addImageUrl = () => {
     if (!newImage.trim()) return;
-
-    set("images", [
-      ...(form.images || []),
-      newImage.trim(),
-    ]);
-
+    set("images", [...(form.images || []), newImage.trim()]);
     setNewImage("");
   };
 
   const removeImage = (i: number) => {
     set(
       "images",
-      (form.images || []).filter(
-        (_: string, idx: number) => idx !== i
-      )
+      (form.images || []).filter((_: string, idx: number) => idx !== i)
     );
   };
 
-  /* FILTERED SUBCATEGORIES */
-
+  /* ── SUBCATEGORY SUGGESTIONS ── */
   const filteredSubcategories =
-    form.category &&
-    subcategoryMap[form.category]
-      ? subcategoryMap[form.category].filter(
-          (sub) =>
-            sub
-              .toLowerCase()
-              .includes(
-                (form.subcategory || "")
-                  .toLowerCase()
-              )
+    form.category && subcategoryMap[form.category]
+      ? subcategoryMap[form.category].filter((sub) =>
+          sub.toLowerCase().includes((form.subcategory || "").toLowerCase())
         )
       : [];
 
-  const labelCls =
-    "text-xs font-medium text-muted-foreground mb-1 block";
-
+  const labelCls = "text-xs font-medium text-muted-foreground mb-1 block";
   const inputCls =
     "w-full border border-border rounded-md px-3 py-2 text-sm bg-background text-foreground focus:ring-2 focus:ring-primary focus:outline-none";
 
@@ -243,16 +212,10 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
         className="bg-card border border-border rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-
         {/* HEADER */}
-
         <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-card z-10">
           <h2 className="text-lg font-bold">Edit Product</h2>
-
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-muted rounded-full"
-          >
+          <button onClick={onClose} className="p-1 hover:bg-muted rounded-full">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -260,70 +223,43 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
         <div className="p-4 space-y-4">
 
           {/* NAME */}
-
           <div>
             <label className={labelCls}>Product Name *</label>
-
             <input
               className={inputCls}
               value={form.name}
-              onChange={(e) =>
-                set("name", e.target.value)
-              }
+              onChange={(e) => set("name", e.target.value)}
             />
           </div>
 
           {/* PRICE */}
-
           <div className="grid grid-cols-2 gap-3">
-
             <div>
-              <label className={labelCls}>
-                Price (KSH) *
-              </label>
-
+              <label className={labelCls}>Price (KSH) *</label>
               <input
                 type="number"
                 className={inputCls}
                 value={form.price}
-                onChange={(e) =>
-                  set("price", +e.target.value)
-                }
+                onChange={(e) => set("price", +e.target.value)}
               />
             </div>
-
             <div>
-              <label className={labelCls}>
-                Original Price
-              </label>
-
+              <label className={labelCls}>Original Price</label>
               <input
                 type="number"
                 className={inputCls}
                 value={form.originalPrice || ""}
                 onChange={(e) =>
-                  set(
-                    "originalPrice",
-                    e.target.value
-                      ? +e.target.value
-                      : undefined
-                  )
+                  set("originalPrice", e.target.value ? +e.target.value : undefined)
                 }
               />
             </div>
-
           </div>
 
           {/* CATEGORY + SUBCATEGORY */}
-
           <div className="grid grid-cols-2 gap-3">
-
             <div>
-
-              <label className={labelCls}>
-                Category *
-              </label>
-
+              <label className={labelCls}>Category *</label>
               <select
                 className={inputCls}
                 value={form.category}
@@ -332,114 +268,64 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
                   set("subcategory", "");
                 }}
               >
-                <option value="">
-                  Select category
-                </option>
-
+                <option value="">Select category</option>
                 {categoryOptions.map((cat) => (
                   <option key={cat} value={cat}>
                     {cat}
                   </option>
                 ))}
-
               </select>
-
             </div>
 
-            {/* SUBCATEGORY */}
-
             <div className="relative">
-
-              <label className={labelCls}>
-                Subcategory
-              </label>
-
+              <label className={labelCls}>Subcategory</label>
               <input
                 className={inputCls}
                 placeholder="Type or select..."
                 value={form.subcategory || ""}
-                onChange={(e) =>
-                  set(
-                    "subcategory",
-                    e.target.value || undefined
-                  )
-                }
+                onChange={(e) => set("subcategory", e.target.value || undefined)}
               />
-
               {filteredSubcategories.length > 0 && (
-
                 <div className="absolute z-20 w-full mt-1 bg-card border rounded-md shadow-md max-h-40 overflow-y-auto">
-
                   {filteredSubcategories.map((sub) => (
-
                     <button
                       key={sub}
                       type="button"
-                      onClick={() =>
-                        set("subcategory", sub)
-                      }
+                      onClick={() => set("subcategory", sub)}
                       className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition"
                     >
                       {sub}
                     </button>
-
                   ))}
-
                 </div>
-
               )}
-
             </div>
-
           </div>
 
           {/* STOCK / DISCOUNT / RATING */}
-
           <div className="grid grid-cols-3 gap-3">
-
             <div>
-              <label className={labelCls}>
-                Stock Qty
-              </label>
-
+              <label className={labelCls}>Stock Qty</label>
               <input
                 type="number"
                 className={inputCls}
                 value={form.stockQuantity}
-                onChange={(e) =>
-                  set(
-                    "stockQuantity",
-                    +e.target.value
-                  )
-                }
+                onChange={(e) => set("stockQuantity", +e.target.value)}
               />
             </div>
-
             <div>
-              <label className={labelCls}>
-                Discount %
-              </label>
-
+              <label className={labelCls}>Discount %</label>
               <input
                 type="number"
                 className={inputCls}
                 value={form.discount || ""}
                 onChange={(e) =>
-                  set(
-                    "discount",
-                    e.target.value
-                      ? +e.target.value
-                      : undefined
-                  )
+                  set("discount", e.target.value ? +e.target.value : undefined)
                 }
               />
             </div>
-
             <div>
-              <label className={labelCls}>
-                Rating
-              </label>
-
+              <label className={labelCls}>Rating</label>
               <input
                 type="number"
                 min={0}
@@ -447,126 +333,73 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
                 step={0.1}
                 className={inputCls}
                 value={form.rating}
-                onChange={(e) =>
-                  set("rating", +e.target.value)
-                }
+                onChange={(e) => set("rating", +e.target.value)}
               />
             </div>
-
           </div>
 
           {/* TOGGLES */}
-
           <div className="flex gap-4 flex-wrap pt-2">
-
             {[
               { key: "inStock", label: "In Stock" },
               { key: "featured", label: "Featured" },
               { key: "deal", label: "Deal" },
             ].map(({ key, label }) => (
-
               <label
                 key={key}
                 className="flex items-center gap-2 text-sm cursor-pointer px-3 py-1 rounded-md border hover:bg-muted transition"
               >
-
                 <input
                   type="checkbox"
                   checked={!!(form as any)[key]}
-                  onChange={(e) =>
-                    set(key, e.target.checked)
-                  }
+                  onChange={(e) => set(key, e.target.checked)}
                   className="accent-primary w-4 h-4"
                 />
-
                 {label}
-
               </label>
-
             ))}
-
           </div>
 
           {/* DESCRIPTION */}
-
           <div>
-
-            <label className={labelCls}>
-              Description
-            </label>
-
+            <label className={labelCls}>Description</label>
             <textarea
               className={`${inputCls} min-h-[80px]`}
               value={form.description || ""}
-              onChange={(e) =>
-                set(
-                  "description",
-                  e.target.value || undefined
-                )
-              }
+              onChange={(e) => set("description", e.target.value || undefined)}
             />
-
           </div>
 
           {/* IMAGES */}
-
           <div>
-
             <label className={labelCls}>
-              Images
+              Images ({(form.images || []).length}/5)
             </label>
 
-            <div className="flex flex-wrap gap-2 mb-2">
-
-              {(form.images || []).map(
-                (img: string, i: number) => (
-
-                  <div
-                    key={i}
-                    className="relative w-16 h-16 rounded border overflow-hidden group"
+            {/* Previews */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {(form.images || []).map((img: string, i: number) => (
+                <div
+                  key={i}
+                  className="relative w-16 h-16 rounded border overflow-hidden group bg-muted"
+                >
+                  <img
+                    src={img}
+                    alt={`Image ${i + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    onClick={() => removeImage(i)}
+                    className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
                   >
-
-                    <img
-                      src={img}
-                      className="w-full h-full object-cover"
-                    />
-
-                    <button
-                      onClick={() => removeImage(i)}
-                      className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center"
-                    >
-                      <Trash2 className="w-4 h-4 text-white" />
-                    </button>
-
-                  </div>
-
-                )
-              )}
-
+                    <Trash2 className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+              ))}
             </div>
 
-            <div className="flex gap-2">
-
-              <input
-                className={`${inputCls} flex-1`}
-                placeholder="Image URL..."
-                value={newImage}
-                onChange={(e) =>
-                  setNewImage(e.target.value)
-                }
-              />
-
-              <button
-                onClick={addImage}
-                className="px-3 py-2 bg-primary text-white rounded-md"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-
-            </div>
-
-            <div className="mt-2">
-
+            {/* Upload file */}
+            <div className="space-y-2">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -575,55 +408,58 @@ const InlineProductEdit = ({ product, onClose }: Props) => {
                 className="hidden"
                 onChange={handleFileUpload}
               />
-
               <button
-                onClick={() =>
-                  fileInputRef.current?.click()
-                }
-                disabled={uploading}
-                className="px-4 py-2 text-sm border border-dashed border-primary rounded-md flex items-center gap-2"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading || (form.images || []).length >= 5}
+                className="px-4 py-2 text-sm border border-dashed border-primary rounded-md flex items-center gap-2 hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
-
                 {uploading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <Upload className="w-4 h-4" />
+                  <Upload className="w-4 h-4 text-primary" />
                 )}
-
-                {uploading
-                  ? "Uploading..."
-                  : "Upload"}
-
+                {uploading ? "Uploading to Cloudinary..." : "Upload Images"}
               </button>
 
+              {/* Add by URL */}
+              <div className="flex gap-2">
+                <input
+                  className={`${inputCls} flex-1`}
+                  placeholder="Or paste image URL..."
+                  value={newImage}
+                  onChange={(e) => setNewImage(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addImageUrl()}
+                />
+                <button
+                  onClick={addImageUrl}
+                  disabled={!newImage.trim()}
+                  className="px-3 py-2 bg-primary text-white rounded-md disabled:opacity-50 hover:opacity-90 transition"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-
           </div>
 
         </div>
 
         {/* FOOTER */}
-
-        <div className="flex justify-end gap-2 p-4 border-t">
-
+        <div className="flex justify-end gap-2 p-4 border-t sticky bottom-0 bg-card">
           <button
             onClick={onClose}
-            className="px-4 py-2 border rounded-md"
+            className="px-4 py-2 border rounded-md hover:bg-muted transition text-sm"
           >
             Cancel
           </button>
-
           <button
             onClick={handleSave}
-            disabled={saving}
-            className="px-4 py-2 bg-primary text-white rounded-md"
+            disabled={saving || uploading}
+            className="px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 hover:opacity-90 disabled:opacity-50 transition text-sm"
           >
-            <Save className="w-4 h-4 inline mr-1" />
+            <Save className="w-4 h-4" />
             {saving ? "Saving..." : "Save Changes"}
           </button>
-
         </div>
-
       </div>
     </div>
   );

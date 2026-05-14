@@ -443,7 +443,7 @@ const CreditRecordsTab = () => {
 
        {/* SUMMARY */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-        <SummaryCard label="Outstanding" value={`KSH ${totals.totalOwed.toLocaleString()}`} icon={DollarSign} color="bg-destructive" />
+        <SummaryCard label="Outstanding (NOT PAID)" value={`KSH ${totals.totalOwed.toLocaleString()}`} icon={DollarSign} color="bg-destructive" />
         <SummaryCard label="Total Credit" value={`KSH ${totals.totalCredit.toLocaleString()}`} icon={DollarSign} color="bg-blue-500" />
         <SummaryCard label="Customers" value={String(totals.customers)} icon={Users} color="bg-purple-500" />
         <SummaryCard label="Overdue" value={String(totals.overdue)} icon={AlertCircle} color="bg-amber-500" />

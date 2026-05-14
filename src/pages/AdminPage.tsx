@@ -470,46 +470,53 @@ const ProductsTab = ({ products, onEdit, onDelete, onAdd, showForm, editingProdu
     const existingCount = editingProduct?.images?.length || (editingProduct?.image ? 1 : 0);
     if (index >= existingCount) setImageFiles(prev => prev.filter((_, i) => i !== (index - existingCount)));
   };
+// ----cloudinary upload logic with validation and error handling----
 
   const handleSave = async () => {
-  if (!formData.name) {
-    toast.error("Product name is required");
-    return;
-  }
-
-  if (!formData.price || formData.price <= 0) {
-    toast.error("Valid price is required");
-    return;
-  }
-
-  if (!formData.category) {
-    toast.error("Category is required");
-    return;
-  }
+  if (!formData.name) { toast.error("Product name is required"); return; }
+  if (!formData.price || formData.price <= 0) { toast.error("Valid price is required"); return; }
+  if (!formData.category) { toast.error("Category is required"); return; }
 
   setUploading(true);
 
   try {
-    
+    // Upload only NEW files (imageFiles) to Cloudinary
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
-    const uploadedUrls: string[] =
-      imagePreviews.length > 0
-        ? imagePreviews
-        : formData.images || [];
+    const uploadedNewUrls: string[] = await Promise.all(
+      imageFiles.map(async (file) => {
+        const formPayload = new FormData();
+        formPayload.append("file", file);
+        formPayload.append("upload_preset", uploadPreset);
+
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          { method: "POST", body: formPayload }
+        );
+
+        if (!res.ok) throw new Error("Cloudinary upload failed");
+        const data = await res.json();
+        return data.secure_url as string;
+      })
+    );
+
+    // Keep existing URLs (already saved images) + newly uploaded ones
+    const existingUrls = imagePreviews.filter((url) => url.startsWith("http"));
+    const allImageUrls = [...existingUrls, ...uploadedNewUrls];
 
     await onSave({
       ...formData,
-      image: uploadedUrls[0] || formData.image || "",
-      images: uploadedUrls,
+      image: allImageUrls[0] || formData.image || "",
+      images: allImageUrls,
     });
 
     toast.success("Product saved successfully");
-
     setImageFiles([]);
     setImagePreviews([]);
   } catch (error) {
     console.error(error);
-    toast.error("Failed to save product");
+    toast.error("Image upload failed. Check your Cloudinary credentials.");
   } finally {
     setUploading(false);
   }
