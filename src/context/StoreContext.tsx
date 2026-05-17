@@ -1,4 +1,3 @@
-
 import React, {
   createContext,
   useContext,
@@ -130,7 +129,8 @@ export const StoreProvider = ({
       );
 
       console.log("STORE PRODUCTS:", data);
-
+      console.log(products);
+      
     } catch (error) {
       console.error(
         "Failed to fetch products:",
@@ -408,4 +408,3 @@ export const useStore = () => {
 
   return context;
 };
-

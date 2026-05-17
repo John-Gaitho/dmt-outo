@@ -8,10 +8,14 @@ const DealsSection = () => {
   const [email, setEmail] = useState("");
 
   useEffect(() => {
-    const deals = products.filter((p) => p.deal);
-    const shuffled = [...deals].sort(() => 0.5 - Math.random());
+    const instockProducts = products.filter((p) => p.inStock);
+    const shuffled = [...instockProducts].sort(() => 0.5 - Math.random());
     setDealProducts(shuffled.slice(0, 2));
   }, [products]);
+
+  console.log(dealProducts);
+  console.log(products[0]);
+
 
   return (
     <section className="py-5 md:py-8">
